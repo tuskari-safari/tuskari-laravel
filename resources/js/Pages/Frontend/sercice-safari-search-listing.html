@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0 ">
+    <title>Tuskari</title>
+
+    <!-- fabicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+
+    <!-- fontawesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/regular.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css">
+
+    <!-- slick slider -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/css/ion.rangeSlider.min.css">
+    <!--select 2 css-->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+
+    <!-- bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tom Selct CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="dashboard_frame">
+        <div class="dashboard_left_panel">
+            <div class="nav_panel">
+                <div class="panel_logo_box">
+                    <a href="javascript:void(0)" class="ham_bttn_close"><img src="images/close.svg" alt="Close"></a>
+                    <a href="#url" class="logo_lnk"><img src="images/logo.svg" alt="Logo"></a>
+                </div>
+                <div class="menu_nav_outr">
+                    <ul class="menu_nav">
+                        <li><a href="service-dashboard.html"><span><img src="images/dshbrd_icon1.svg"
+                                        alt="Dashboard"></span>Dashboard</a></li>
+                        <li><a href="my-trips.html"><span><img src="images/dshbrd_icon2.svg" alt="MyTrip"></span>Manage listings</a></li>
+                        <li><a href="saved-safaris.html"><span><img src="images/bookiconsvg.svg" alt="Saved Safari"></span>Bookings</a></li>
+                        <li><a href="service-message.html"><span><img src="images/dshbrd_icon4.svg" alt="Message"></span>Messaging</a></li>
+                        <li><a href="payments.html"><span><img src="images/dshbrd_icon5.svg" alt="Payments"></span>Earnings</a></li>
+                        <li><a href="service-my-profile.html"><span><img src="images/dshbrd_icon6.svg" alt="Profile"></span>My Profile</a></li>
+                        <!-- <li><a href="help-support.html"><span><img src="images/dshbrd_icon7.svg" alt="Help"></span>Help & Support</a>
+                        </li> -->
+                        <li><a href="#url"><span><img src="images/dshbrd_icon8.svg" alt="Log Out"></span>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="menu_ovrly"></div>
+        </div>
+        <div class="dashboard_right_panel">
+            <div class="rght_panel_header">
+                <div class="panel_hdr_lft">
+                    <a href="javascript:void(0)" class="ham_bttn">
+                        <img src="images/ham_icon.svg" alt="ham icon">
+                    </a>
+                    <h1><span class="user_grtngs">Hey Kian, Welcome!</h1>
+                </div>
+                <div class="panel_hdr_rght extraml">
+                    <!-- <div class="hder_srch_box">
+                    <input type="text" placeholder="Search">
+                    <button type="button" class="srch_flter sf-filterbutn" data-target="popup1"><img src="images/sttngs_icon.svg" alt=""></button>
+                    <a href="javascript:void(0)" class="srch_bttn"><img src="images/whte_srch.svg" alt=""></a>
+                </div> -->
+                    <div class="ntfctn_holder">
+                        <a href="javascript:void(0)" class="ntfctn_bttn">
+                            <img src="images/noti_icon.svg" alt="">
+                            <span class="ntfctn_dot"></span>
+                        </a>
+                    </div>
+                    <div class="user_dropbox dropdown">
+                        <a href="javascript:void(0)" class="usr_bttn dropdown-toggle" data-bs-toggle="dropdown">
+                            <div class="user_drp_prfle_box">
+                                <div class="usrDrp_prfle_imgbox">
+                                    <img src="images/manimage.jpg" alt="">
+                                </div>
+                                <span>Kian</span>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="javascript:void(0)">Action</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)">Another action</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)">Something else here</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="panel_rght_cntnt_area">
+                <div class="trips_wrppr mt-0">
+                    <div class="trips_hder trips_header">
+                        <!-- <div class="hdr_lft_prt hdr-lft-backarw">
+                            <a href="javascript:void(0)" class="backarow"><i><img src="images/back-blck-arrow.svg" alt="Back Arrow"></i>
+                                Back</a>
+                        </div> -->
+                        <div class="hdr_rght_prt ms-auto">
+                            <div class="srtng_box">
+                                <a href="#url" class="cmn-butn">Create new listing</a>
+                                <!-- <div class="srtng_txt_prt">
+                                    <p>Sort by:</p>
+                                </div>
+                                <div class="sortng_input_hlder">
+                                    <div class="sortng_input_col">
+                                        <select class="cstm_slect">
+                                            <option>Price</option>
+                                            <option value="Low to High">Low to High</option>
+                                            <option value="High to Low">High to Low</option>
+                                        </select>
+                                    </div>
+                                    <div class="sortng_input_col">
+                                        <select class="cstm_slect">
+                                            <option value="Rating" hidden>Rating</option>
+                                            <option value="op1">Option 1</option>
+                                            <option value="op2">Option 2</option>
+                                        </select>
+                                    </div>
+                                    <div class="sortng_input_col">
+                                        <select class="cstm_slect">
+                                            <option value="Relevance">Relevance</option>
+                                            <option value="op1">Option 1</option>
+                                            <option value="op2">Option 2</option>
+                                        </select>
+                                    </div>
+                                </div> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sfri-serch-list-wrap">
+                        <div class="row sfl-list-row">
+                            <div class="col-xl-3 col-lg-4 col-md-6 sfl-list-col">
+                                <div class="ft-exp-item">
+                                    <div class="ft-exp-itm-tppnl">
+                                        <figure class="ft-exp-itmimgbx">
+                                            <img src="images/sfl-1.jpg" alt="Feature Image">
+                                        </figure>
+                                        <a href="javascript:void(0)" class="ft-whstlstbutn" tabindex="0"><img
+                                                src="images/whishlisticon.svg" alt="Whishlist">
+                                        </a>
+                                        <div class="ft-ratng">
+                                            <i class="ftrate-img"><img src="images/ratingwhtstr.svg"
+                                                    alt="Rate Star"></i>
+                                            <span>4.5</span>
+                                        </div>
+                                        <div class="ft-exptag-wrpr">
+                                            <div class="ft-exp-taglistbx">
+                                                <ul>
+                                                    <li>Luxury</li>
+                                                    <li>Namibia</li>
+                                                </ul>
+                                            </div>
+                                            <a href="javascript:void(0)" class="ftview-butn" tabindex="0"><img src="images/ftviewimg.svg"
+                                                    alt="View Image"></a>
+                                        </div>
+                                    </div>
+                                    <div class="ft-exp-itm-btmpnl">
+                                        <div class="ft-exp-prs-bx">
+                                            <span class="ft-exp-prs">£2,350</span>
+                                            <span class="ft-exp-daytime">6 nights</span>
+                                        </div>
+                                        <div class="h3-title ft-exp-itmhd">
+                                            <a href="javascript:void(0)" tabindex="0">7-Day Namibia Desert & Dunes...</a>
+                                        </div>
+                                        <p>
+                                            Explore towering dunes, surreal desertscapes, and desert-adapted...
+                                        </p>
+                                        <a href="javascript:void(0)" class="ft-exp-itmbutn" tabindex="0">View trip details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-4 col-md-6 sfl-list-col">
+                                <div class="ft-exp-item">
+                                    <div class="ft-exp-itm-tppnl">
+                                        <figure class="ft-exp-itmimgbx">
+                                            <img src="images/sfl-2.jpg" alt="Feature Image">
+                                        </figure>
+                                        <a href="javascript:void(0)" class="ft-whstlstbutn" tabindex="0"><img
+                                                src="images/whishlisticon.svg" alt="Whishlist">
+                                        </a>
+                                        <div class="ft-ratng">
+                                            <i class="ftrate-img"><img src="images/ratingwhtstr.svg"
+                                                    alt="Rate Star"></i>
+                                            <span>4.5</span>
+                                        </div>
+                                        <div class="ft-exptag-wrpr">
+                                            <div class="ft-exp-taglistbx">
+                                                <ul>
+                                                    <li>Mid-Range</li>
+                                                    <li>Zambia</li>
+                                                </ul>
+                                            </div>
+                                            <a href="javascript:void(0)" class="ftview-butn" tabindex="0"><img src="images/ftviewimg.svg"
+                                                    alt="View Image"></a>
+                                        </div>
+                                    </div>
+                                    <div class="ft-exp-itm-btmpnl">
+                                        <div class="ft-exp-prs-bx">
+                                            <span class="ft-exp-prs">£1,950</span>
+                                            <span class="ft-exp-daytime">4 nights</span>
+                                        </div>
+                                        <div class="h3-title ft-exp-itmhd">
+                                            <a href="javascript:void(0)" tabindex="0">5-Day Lower Zambezi River and...</a>
+                                        </div>
+                                        <p>
+                                            Canoe safaris, riverbank sundowners, and big game in Zambia’s wild and...
+                                        </p>
+                                        <a href="javascript:void(0)" class="ft-exp-itmbutn" tabindex="0">View trip details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-4 col-md-6 sfl-list-col">
+                                <div class="ft-exp-item">
+                                    <div class="ft-exp-itm-tppnl">
+                                        <figure class="ft-exp-itmimgbx">
+                                            <img src="images/sfl-3.jpg" alt="Feature Image">
+                                        </figure>
+                                        <a href="javascript:void(0)" class="ft-whstlstbutn" tabindex="0"><img
+                                                src="images/whishlisticon.svg" alt="Whishlist">
+                                        </a>
+                                        <div class="ft-ratng">
+                                            <i class="ftrate-img"><img src="images/ratingwhtstr.svg"
+                                                    alt="Rate Star"></i>
+                                            <span>4.5</span>
+                                        </div>
+                                        <div class="ft-exptag-wrpr">
+                                            <div class="ft-exp-taglistbx">
+                                                <ul>
+                                                    <li>Luxury</li>
+                                                    <li>Namibia</li>
+                                                </ul>
+                                            </div>
+                                            <a href="javascript:void(0)" class="ftview-butn" tabindex="0"><img src="images/ftviewimg.svg"
+                                                    alt="View Image"></a>
+                                        </div>
+                                    </div>
+                                    <div class="ft-exp-itm-btmpnl">
+                                        <div class="ft-exp-prs-bx">
+                                            <span class="ft-exp-prs">£3,950</span>
+                                            <span class="ft-exp-daytime">3 nights</span>
+                                        </div>
+                                        <div class="h3-title ft-exp-itmhd">
+                                            <a href="javascript:void(0)" tabindex="0">4-Day Skeleton Coast Fly-in Safari</a>
+                                        </div>
+                                        <p>
+                                            A bucket-list journey to Namibia’s haunting Skeleton Coast with scenic...
+                                        </p>
+                                        <a href="javascript:void(0)" class="ft-exp-itmbutn" tabindex="0">View trip details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-4 col-md-6 sfl-list-col">
+                                <div class="ft-exp-item">
+                                    <div class="ft-exp-itm-tppnl">
+                                        <figure class="ft-exp-itmimgbx">
+                                            <img src="images/sfl-4.jpg" alt="Feature Image">
+                                        </figure>
+                                        <a href="javascript:void(0)" class="ft-whstlstbutn" tabindex="0"><img
+                                                src="images/whishlisticon.svg" alt="Whishlist">
+                                        </a>
+                                        <div class="ft-ratng">
+                                            <i class="ftrate-img"><img src="images/ratingwhtstr.svg"
+                                                    alt="Rate Star"></i>
+                                            <span>4.5</span>
+                                        </div>
+                                        <div class="ft-exptag-wrpr">
+                                            <div class="ft-exp-taglistbx">
+                                                <ul>
+                                                    <li>Mid-Range</li>
+                                                    <li>Kenya</li>
+                                                </ul>
+                                            </div>
+                                            <a href="javascript:void(0)" class="ftview-butn" tabindex="0"><img src="images/ftviewimg.svg"
+                                                    alt="View Image"></a>
+                                        </div>
+                                    </div>
+                                    <div class="ft-exp-itm-btmpnl">
+                                        <div class="ft-exp-prs-bx">
+                                            <span class="ft-exp-prs">£980.00</span>
+                                            <span class="ft-exp-daytime">2 nights</span>
+                                        </div>
+                                        <div class="h3-title ft-exp-itmhd">
+                                            <a href="javascript:void(0)" tabindex="0">3-Day Samburu Cultural & Wildlife...</a>
+                                        </div>
+                                        <p>
+                                            A laid-back escape into northern Kenya’s Samburu region—known for unique...
+                                        </p>
+                                        <a href="javascript:void(0)" class="ft-exp-itmbutn" tabindex="0">View trip details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-4 col-md-6 sfl-list-col">
+                                <div class="ft-exp-item">
+                                    <div class="ft-exp-itm-tppnl">
+                                        <figure class="ft-exp-itmimgbx">
+                                            <img src="images/sfl-5.jpg" alt="Feature Image">
+                                        </figure>
+                                        <a href="javascript:void(0)" class="ft-whstlstbutn" tabindex="0"><img
+                                                src="images/whishlisticon.svg" alt="Whishlist">
+                                        </a>
+                                        <div class="ft-ratng">
+                                            <i class="ftrate-img"><img src="images/ratingwhtstr.svg"
+                                                    alt="Rate Star"></i>
+                                            <span>4.5</span>
+                                        </div>
+                                        <div class="ft-exptag-wrpr">
+                                            <div class="ft-exp-taglistbx">
+                                                <ul>
+                                                    <li>Luxury</li>
+                                                    <li>Namibia</li>
+                                                </ul>
+                                            </div>
+                                            <a href="javascript:void(0)" class="ftview-butn" tabindex="0"><img src="images/ftviewimg.svg"
+                                                    alt="View Image"></a>
+                                        </div>
+                                    </div>
+                                    <div class="ft-exp-itm-btmpnl">
+                                        <div class="ft-exp-prs-bx">
+                                            <span class="ft-exp-prs">£2,350</span>
+                                            <span class="ft-exp-daytime">6 nights</span>
+                                        </div>
+                                        <div class="h3-title ft-exp-itmhd">
+                                            <a href="javascript:void(0)" tabindex="0">7-Day Namibia Desert & Dunes...</a>
+                                        </div>
+                                        <p>
+                                            Explore towering dunes, surreal desertscapes, and desert-adapted...
+                                        </p>
+                                        <a href="javascript:void(0)" class="ft-exp-itmbutn" tabindex="0">View trip details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-4 col-md-6 sfl-list-col">
+                                <div class="ft-exp-item">
+                                    <div class="ft-exp-itm-tppnl">
+                                        <figure class="ft-exp-itmimgbx">
+                                            <img src="images/sfl-6.jpg" alt="Feature Image">
+                                        </figure>
+                                        <a href="javascript:void(0)" class="ft-whstlstbutn" tabindex="0"><img
+                                                src="images/whishlisticon.svg" alt="Whishlist">
+                                        </a>
+                                        <div class="ft-ratng">
+                                            <i class="ftrate-img"><img src="images/ratingwhtstr.svg"
+                                                    alt="Rate Star"></i>
+                                            <span>4.5</span>
+                                        </div>
+                                        <div class="ft-exptag-wrpr">
+                                            <div class="ft-exp-taglistbx">
+                                                <ul>
+                                                    <li>Mid-Range</li>
+                                                    <li>Zambia</li>
+                                                </ul>
+                                            </div>
+                                            <a href="javascript:void(0)" class="ftview-butn" tabindex="0"><img src="images/ftviewimg.svg"
+                                                    alt="View Image"></a>
+                                        </div>
+                                    </div>
+                                    <div class="ft-exp-itm-btmpnl">
+                                        <div class="ft-exp-prs-bx">
+                                            <span class="ft-exp-prs">£1,950</span>
+                                            <span class="ft-exp-daytime">4 nights</span>
+                                        </div>
+                                        <div class="h3-title ft-exp-itmhd">
+                                            <a href="javascript:void(0)" tabindex="0">5-Day Lower Zambezi River and...</a>
+                                        </div>
+                                        <p>
+                                            Canoe safaris, riverbank sundowners, and big game in Zambia’s wild and...
+                                        </p>
+                                        <a href="javascript:void(0)" class="ft-exp-itmbutn" tabindex="0">View trip details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-4 col-md-6 sfl-list-col">
+                                <div class="ft-exp-item">
+                                    <div class="ft-exp-itm-tppnl">
+                                        <figure class="ft-exp-itmimgbx">
+                                            <img src="images/sfl-7.jpg" alt="Feature Image">
+                                        </figure>
+                                        <a href="javascript:void(0)" class="ft-whstlstbutn" tabindex="0"><img
+                                                src="images/whishlisticon.svg" alt="Whishlist">
+                                        </a>
+                                        <div class="ft-ratng">
+                                            <i class="ftrate-img"><img src="images/ratingwhtstr.svg"
+                                                    alt="Rate Star"></i>
+                                            <span>4.5</span>
+                                        </div>
+                                        <div class="ft-exptag-wrpr">
+                                            <div class="ft-exp-taglistbx">
+                                                <ul>
+                                                    <li>Luxury</li>
+                                                    <li>Namibia</li>
+                                                </ul>
+                                            </div>
+                                            <a href="javascript:void(0)" class="ftview-butn" tabindex="0"><img src="images/ftviewimg.svg"
+                                                    alt="View Image"></a>
+                                        </div>
+                                    </div>
+                                    <div class="ft-exp-itm-btmpnl">
+                                        <div class="ft-exp-prs-bx">
+                                            <span class="ft-exp-prs">£3,950</span>
+                                            <span class="ft-exp-daytime">3 nights</span>
+                                        </div>
+                                        <div class="h3-title ft-exp-itmhd">
+                                            <a href="javascript:void(0)" tabindex="0">4-Day Skeleton Coast Fly-in Safari</a>
+                                        </div>
+                                        <p>
+                                            A bucket-list journey to Namibia’s haunting Skeleton Coast with scenic...
+                                        </p>
+                                        <a href="javascript:void(0)" class="ft-exp-itmbutn" tabindex="0">View trip details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-4 col-md-6 sfl-list-col">
+                                <div class="ft-exp-item">
+                                    <div class="ft-exp-itm-tppnl">
+                                        <figure class="ft-exp-itmimgbx">
+                                            <img src="images/sfl-8.jpg" alt="Feature Image">
+                                        </figure>
+                                        <a href="javascript:void(0)" class="ft-whstlstbutn" tabindex="0"><img
+                                                src="images/whishlisticon.svg" alt="Whishlist">
+                                        </a>
+                                        <div class="ft-ratng">
+                                            <i class="ftrate-img"><img src="images/ratingwhtstr.svg"
+                                                    alt="Rate Star"></i>
+                                            <span>4.5</span>
+                                        </div>
+                                        <div class="ft-exptag-wrpr">
+                                            <div class="ft-exp-taglistbx">
+                                                <ul>
+                                                    <li>Mid-Range</li>
+                                                    <li>Kenya</li>
+                                                </ul>
+                                            </div>
+                                            <a href="javascript:void(0)" class="ftview-butn" tabindex="0"><img src="images/ftviewimg.svg"
+                                                    alt="View Image"></a>
+                                        </div>
+                                    </div>
+                                    <div class="ft-exp-itm-btmpnl">
+                                        <div class="ft-exp-prs-bx">
+                                            <span class="ft-exp-prs">£980.00</span>
+                                            <span class="ft-exp-daytime">2 nights</span>
+                                        </div>
+                                        <div class="h3-title ft-exp-itmhd">
+                                            <a href="javascript:void(0)" tabindex="0">3-Day Samburu Cultural & Wildlife...</a>
+                                        </div>
+                                        <p>
+                                            A laid-back escape into northern Kenya’s Samburu region—known for unique...
+                                        </p>
+                                        <a href="javascript:void(0)" class="ft-exp-itmbutn" tabindex="0">View trip details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-4 col-md-6 sfl-list-col">
+                                <div class="ft-exp-item">
+                                    <div class="ft-exp-itm-tppnl">
+                                        <figure class="ft-exp-itmimgbx">
+                                            <img src="images/sfl-9.jpg" alt="Feature Image">
+                                        </figure>
+                                        <a href="javascript:void(0)" class="ft-whstlstbutn" tabindex="0"><img
+                                                src="images/whishlisticon.svg" alt="Whishlist">
+                                        </a>
+                                        <div class="ft-ratng">
+                                            <i class="ftrate-img"><img src="images/ratingwhtstr.svg"
+                                                    alt="Rate Star"></i>
+                                            <span>4.5</span>
+                                        </div>
+                                        <div class="ft-exptag-wrpr">
+                                            <div class="ft-exp-taglistbx">
+                                                <ul>
+                                                    <li>Luxury</li>
+                                                    <li>Namibia</li>
+                                                </ul>
+                                            </div>
+                                            <a href="javascript:void(0)" class="ftview-butn" tabindex="0"><img src="images/ftviewimg.svg"
+                                                    alt="View Image"></a>
+                                        </div>
+                                    </div>
+                                    <div class="ft-exp-itm-btmpnl">
+                                        <div class="ft-exp-prs-bx">
+                                            <span class="ft-exp-prs">£2,350</span>
+                                            <span class="ft-exp-daytime">6 nights</span>
+                                        </div>
+                                        <div class="h3-title ft-exp-itmhd">
+                                            <a href="javascript:void(0)" tabindex="0">7-Day Namibia Desert & Dunes...</a>
+                                        </div>
+                                        <p>
+                                            Explore towering dunes, surreal desertscapes, and desert-adapted...
+                                        </p>
+                                        <a href="javascript:void(0)" class="ft-exp-itmbutn" tabindex="0">View trip details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-4 col-md-6 sfl-list-col">
+                                <div class="ft-exp-item">
+                                    <div class="ft-exp-itm-tppnl">
+                                        <figure class="ft-exp-itmimgbx">
+                                            <img src="images/sfl-10.jpg" alt="Feature Image">
+                                        </figure>
+                                        <a href="javascript:void(0)" class="ft-whstlstbutn" tabindex="0"><img
+                                                src="images/whishlisticon.svg" alt="Whishlist">
+                                        </a>
+                                        <div class="ft-ratng">
+                                            <i class="ftrate-img"><img src="images/ratingwhtstr.svg"
+                                                    alt="Rate Star"></i>
+                                            <span>4.5</span>
+                                        </div>
+                                        <div class="ft-exptag-wrpr">
+                                            <div class="ft-exp-taglistbx">
+                                                <ul>
+                                                    <li>Mid-Range</li>
+                                                    <li>Zambia</li>
+                                                </ul>
+                                            </div>
+                                            <a href="javascript:void(0)" class="ftview-butn" tabindex="0"><img src="images/ftviewimg.svg"
+                                                    alt="View Image"></a>
+                                        </div>
+                                    </div>
+                                    <div class="ft-exp-itm-btmpnl">
+                                        <div class="ft-exp-prs-bx">
+                                            <span class="ft-exp-prs">£1,950</span>
+                                            <span class="ft-exp-daytime">4 nights</span>
+                                        </div>
+                                        <div class="h3-title ft-exp-itmhd">
+                                            <a href="javascript:void(0)" tabindex="0">5-Day Lower Zambezi River and...</a>
+                                        </div>
+                                        <p>
+                                            Canoe safaris, riverbank sundowners, and big game in Zambia’s wild and...
+                                        </p>
+                                        <a href="javascript:void(0)" class="ft-exp-itmbutn" tabindex="0">View trip details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-4 col-md-6 sfl-list-col">
+                                <div class="ft-exp-item">
+                                    <div class="ft-exp-itm-tppnl">
+                                        <figure class="ft-exp-itmimgbx">
+                                            <img src="images/sfl-11.jpg" alt="Feature Image">
+                                        </figure>
+                                        <a href="javascript:void(0)" class="ft-whstlstbutn" tabindex="0"><img
+                                                src="images/whishlisticon.svg" alt="Whishlist">
+                                        </a>
+                                        <div class="ft-ratng">
+                                            <i class="ftrate-img"><img src="images/ratingwhtstr.svg"
+                                                    alt="Rate Star"></i>
+                                            <span>4.5</span>
+                                        </div>
+                                        <div class="ft-exptag-wrpr">
+                                            <div class="ft-exp-taglistbx">
+                                                <ul>
+                                                    <li>Luxury</li>
+                                                    <li>Namibia</li>
+                                                </ul>
+                                            </div>
+                                            <a href="javascript:void(0)" class="ftview-butn" tabindex="0"><img src="images/ftviewimg.svg"
+                                                    alt="View Image"></a>
+                                        </div>
+                                    </div>
+                                    <div class="ft-exp-itm-btmpnl">
+                                        <div class="ft-exp-prs-bx">
+                                            <span class="ft-exp-prs">£3,950</span>
+                                            <span class="ft-exp-daytime">3 nights</span>
+                                        </div>
+                                        <div class="h3-title ft-exp-itmhd">
+                                            <a href="javascript:void(0)" tabindex="0">4-Day Skeleton Coast Fly-in Safari</a>
+                                        </div>
+                                        <p>
+                                            A bucket-list journey to Namibia’s haunting Skeleton Coast with scenic...
+                                        </p>
+                                        <a href="javascript:void(0)" class="ft-exp-itmbutn" tabindex="0">View trip details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-4 col-md-6 sfl-list-col">
+                                <div class="ft-exp-item">
+                                    <div class="ft-exp-itm-tppnl">
+                                        <figure class="ft-exp-itmimgbx">
+                                            <img src="images/sfl-12.jpg" alt="Feature Image">
+                                        </figure>
+                                        <a href="javascript:void(0)" class="ft-whstlstbutn" tabindex="0"><img
+                                                src="images/whishlisticon.svg" alt="Whishlist">
+                                        </a>
+                                        <div class="ft-ratng">
+                                            <i class="ftrate-img"><img src="images/ratingwhtstr.svg"
+                                                    alt="Rate Star"></i>
+                                            <span>4.5</span>
+                                        </div>
+                                        <div class="ft-exptag-wrpr">
+                                            <div class="ft-exp-taglistbx">
+                                                <ul>
+                                                    <li>Mid-Range</li>
+                                                    <li>Kenya</li>
+                                                </ul>
+                                            </div>
+                                            <a href="javascript:void(0)" class="ftview-butn" tabindex="0"><img src="images/ftviewimg.svg"
+                                                    alt="View Image"></a>
+                                        </div>
+                                    </div>
+                                    <div class="ft-exp-itm-btmpnl">
+                                        <div class="ft-exp-prs-bx">
+                                            <span class="ft-exp-prs">£980.00</span>
+                                            <span class="ft-exp-daytime">2 nights</span>
+                                        </div>
+                                        <div class="h3-title ft-exp-itmhd">
+                                            <a href="javascript:void(0)" tabindex="0">3-Day Samburu Cultural & Wildlife...</a>
+                                        </div>
+                                        <p>
+                                            A laid-back escape into northern Kenya’s Samburu region—known for unique...
+                                        </p>
+                                        <a href="javascript:void(0)" class="ft-exp-itmbutn" tabindex="0">View trip details</a>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="srch_ovrlay">
+        <div class="ovrly_srch_hldr">
+            <div class="hder_srch_box">
+                <input type="text" placeholder="Search">
+                <button type="button" class="srch_flter sf-filterbutn" data-target="popup1">
+                    <img src="images/sttngs_icon.svg" alt="Setting">
+                </button>
+            </div>
+            <a href="javascript:void(0)" class="srch_close_bttn"><img src="images/close.svg" alt="close"></a>
+        </div>
+    </div>
+
+    <!--filter popup-->
+    <div class="filtr-backdrop" data-popup="popup1"></div>
+    <div class="filtr-rgtsdepnl" data-popup="popup1">
+        <button class="fltrpop-closebutn" type="button">
+            <img src="images/popclose-img.svg" alt="Close">
+        </button>
+        <div class="filtr-rgtsdepnl-inr">
+            <div class="filtr-rgtsdepnlhd">
+                <h2 class="filtrpnlhdng">Filter Your Journey</h2>
+                <p>Narrow it down. Explore better.</p>
+            </div>
+            <div class="fltr-ppupfrm">
+                <form>
+                    <!-- <div class="fltr-inputfldbx fltr-inputfld-icon">
+                   <i class="fltrinpt-icon"><img src="images/locationicon.svg" alt="location"></i>
+                    <input type="text" placeholder="Where do you want to go?">
+                 </div> -->
+
+                    <div class="ftrppup-chckbxwrpr">
+                        <div class="ftrppup-checkbxhd">1. Trip Duration</div>
+                        <div class="ftrppup-checkbx-rw">
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span>3–5 days</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span>6-8 days</span>
+                                </label>
+                            </div>
+
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span>9+ days</span>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="ftrppup-chckbxwrpr">
+                        <div class="ftrppup-checkbxhd">2. Travel Season</div>
+                        <div class="ftrppup-checkbx-rw">
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span>Dry Season</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span>Green Season</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ftrppup-chckbxwrpr">
+                        <div class="ftrppup-checkbxhd">3. Region / Destination</div>
+                        <div class="mulslect-drpdwn">
+                            <select class="multiselct" multiple="multiple">
+                                <option value="Countries">Countries (e.g. Kenya, Botswana)</option>
+                                <option value="Regions">Regions (e.g. Southern Africa, East Africa)</option>
+                                <option value="Parks/Reserves">Parks/Reserves (e.g. Maasai Mara, Kruger)</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <div class="ftrppup-chckbxwrpr">
+                        <div class="ftrppup-checkbxhd">4. Safari Type</div>
+                        <div class="ftrppup-checkbx-rw">
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span>Luxury Safari</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span> Mid-Range Safari</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span> Budget Safari</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span> Private Safari</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span> Group Safari</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span>Family Safari</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span>Honeymoon Safari</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span>Solo Traveller Friendly Safari</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span>Self-drive Safari</span>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="ftrppup-chckbxwrpr">
+                        <div class="ftrppup-checkbxhd">5. Experience & Wildlife Highlights</div>
+                        <div class="mulslect-drpdwn">
+                            <select class="multiselct" multiple="multiple">
+                                <option value="Big Five">Big Five</option>
+                                <option value="Gorilla trekking">Gorilla trekking</option>
+                                <option value="Chimpanzee trekking">Chimpanzee trekking</option>
+                                <option value="Great Migration">Great Migration</option>
+                                <option value="Predator sightings">Predator sightings</option>
+                                <option value="Birdwatching">Birdwatching</option>
+                                <option value="Photographic hides">Photographic hides</option>
+                                <option value="River crossings">River crossingss</option>
+                                <option value="Night drives">Night drives</option>
+                                <option value="Rare/endemic species">Rare/endemic species</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="ftrppup-chckbxwrpr prcrangwrpr">
+                        <div class="ftrppup-checkbxhd">6. Activities</div>
+                        <div class="ftrppup-checkbx-rw actvity-checkbx">
+                            <div class="ftrppup-checkbx-col checkbx-col6">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span><i class="activity-icon"><img src="images/gamedrives-icon.svg" alt="Icon"></i>
+                                        Game drives</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col checkbx-col6">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span><i class="activity-icon"><img src="images/walksafari.svg"
+                                                alt="Icon"></i>Walking safaris</span>
+                                </label>
+                            </div>
+
+                            <div class="ftrppup-checkbx-col checkbx-col6">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span><i class="activity-icon"><img src="images/canonsafari.svg"
+                                                alt="Icon"></i>Canoe safaris</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col checkbx-col6">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span><i class="activity-icon"><img src="images/boatsafari.svg" alt="Icon"></i>Boat
+                                        safaris</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col checkbx-col6">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span><i class="activity-icon"><img src="images/airbalonsafari.svg"
+                                                alt="Icon"></i>Hot air balloon</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col checkbx-col6">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span><i class="activity-icon"><img src="images/cuturalicon.svg"
+                                                alt="Icon"></i>Cultural experiences</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col checkbx-col6">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span><i class="activity-icon"><img src="images/horseback.svg"
+                                                alt="Icon"></i>Horseback safaris</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col checkbx-col6">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span><i class="activity-icon"><img src="images/fishingicon.svg"
+                                                alt="Icon"></i>Fishing</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col checkbx-col6">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span><i class="activity-icon"><img src="images/volunteericon.svg"
+                                                alt="Icon"></i>Conservation / volunteering</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col checkbx-col6">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="checkbox">
+                                    <span><i class="activity-icon"><img src="images/sleepouticon.svg"
+                                                alt="Icon"></i>Sleep-outs / star beds</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="ftrppup-chckbxwrpr">
+                        <div class="ftrppup-checkbxhd">7. Ecosystems / Landscapes</div>
+                        <label class="enbromrnylbel">Environment</label>
+                        <div class="mulslect-drpdwn">
+                            <select class="multiselct" multiple="multiple">
+                                <option value="Rainfores">Rainforest</option>
+                                <option value="Savannah">Savannah</option>
+                                <option value="Desert">Desert</option>
+                                <option value="Wetlands">Wetlands</option>
+                                <option value="Mountains">Mountains</option>
+                                <option value="Rivers / Delta">Rivers / Delta</option>
+                                <option value="Coastal">Coastal</option>
+                                <option value="Crater / Caldera">Crater / Caldera</option>
+                                <option value="Open Plains">Open Plains</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="ftrppup-chckbxwrpr">
+                        <div class="ftrppup-checkbxhd">8. Activity Level</div>
+                        <div class="ftrppup-checkbx-rw">
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="radio" name="name">
+                                    <span>Relaxed</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="radio" name="name">
+                                    <span>Moderate</span>
+                                </label>
+                            </div>
+
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="radio" name="name">
+                                    <span>Active</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="ftrppup-chckbxwrpr">
+                        <div class="ftrppup-checkbxhd">9. Traveller Group</div>
+                        <div class="fltr-trv-qunttybx">
+                            <div class="fltr-trv-quntcont">
+                                <div class="fltr-trv-qunthd">Number of Adults </div>
+                            </div>
+                            <div class="fltr-trv-qunt">
+                                <button type="button" class="quntybtn quntybtn-minus">
+                                    <img src="images/quantity-minusicon.svg" alt="Minus">
+                                </button>
+                                <input type="text" value="0">
+                                <button type="button" class="quntybtn quntybtn-plus">
+                                    <img src="images/quntityplusicon.svg" alt="Plus">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="fltr-trv-qunttybx">
+                            <div class="fltr-trv-quntcont">
+                                <div class="fltr-trv-qunthd">Number of Children</div>
+                            </div>
+                            <div class="fltr-trv-qunt">
+                                <button type="button" class="quntybtn quntybtn-minus">
+                                    <img src="images/quantity-minusicon.svg" alt="Minus">
+                                </button>
+                                <input type="text" value="0">
+                                <button type="button" class="quntybtn quntybtn-plus">
+                                    <img src="images/quntityplusicon.svg" alt="Plus">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="ftrppup-chckbxwrpr">
+                        <div class="ftrppup-checkbxhd">10. Price</div>
+                        <div class="fltrpop-rangewrpr">
+                            <input type="text" class="js-range-slider" name="my_range" value="" data-min="100"
+                                data-max="20000" />
+                            <div class="fltrpop-range-inputbx">
+                                <div class="fltrpop-range-input">
+                                    <label>Minimum</label>
+                                    <input id="input-rngeform" type="text" class="rangeiput js-input-from" value="0">
+                                </div>
+                                <span class="fltrpop-rnge-inline">-</span>
+                                <div class="fltrpop-range-input">
+                                    <label>Maximum</label>
+                                    <input id="input-rngeto" type="text" class="rangeiput js-input-to" value="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ftrppup-chckbxwrpr">
+                        <div class="ftrppup-checkbxhd">11. Availability Tags </div>
+                        <div class="ftrppup-checkbx-rw">
+                            <div class="ftrppup-checkbx-col checkbx-col6">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="radio" name="name">
+                                    <span>Last-minute available</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col checkbx-col6">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="radio" name="name">
+                                    <span>Limited spaces</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ftrppup-chckbxwrpr rlvnce-wrpr">
+                        <div class="ftrppup-checkbxhd">Relevance</div>
+                        <div class="ftrppup-checkbx-rw">
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="radio" name="name">
+                                    <span>Relevance 1</span>
+                                </label>
+                            </div>
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="radio" name="name">
+                                    <span>Relevance 2</span>
+                                </label>
+                            </div>
+
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="radio" name="name">
+                                    <span>Relevance 3</span>
+                                </label>
+                            </div>
+
+                            <div class="ftrppup-checkbx-col">
+                                <label class="ftrppup-chkbx-lbl">
+                                    <input type="radio" name="name">
+                                    <span>Relevance 4</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="ftrppup-butnbx">
+                        <button type="button" class="cmn-butn wht-butn ppcncelbutn">Cancel</button>
+                        <button type="submit" class="cmn-butn">Save</button>
+                    </div>
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--filter popup-->
+
+    <!--log out filter popup-->
+    <div class="filtr-backdrop" data-popup="logout"></div>
+    <div class="filtr-rgtsdepnl" data-popup="logout">
+        <button class="fltrpop-closebutn" type="button">
+            <img src="images/popclose-img.svg" alt="Close">
+        </button>
+        <div class="filtr-rgtsdepnl-inr">
+            <div class="lgout_popup_wrap">
+                <div class="lgout_inner_box">
+                    <div class="lg_out_icon">
+                        <img src="images/logout-pop.svg" alt="logout icon">
+                    </div>
+                    <h2 class="filtrpnlhdng">Logout</h2>
+                    <p>Do you want to logout from your dashboard?</p>
+                    <a href="#url" class="cmn-butn">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--log out filter popup-->
+
+
+
+    <!-- Jquery-->
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/js/ion.rangeSlider.min.js"></script>
+    <!--select 2 js-->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- Tom Select Js -->
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    <script src="js/common.js"></script>
+</body>
+
+</html>
