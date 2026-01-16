@@ -9,10 +9,12 @@ use App\Models\KeyExperience;
 use App\Models\NationalParkAndReserves;
 use App\Models\Region;
 use App\Models\Safari;
+use App\Models\SafariDate;
 use App\Models\SafariGroupPricing;
 use App\Models\SafariImage;
 use App\Models\SafariJourney;
 use App\Models\SafariType;
+use App\Models\SeasonalPricing;
 use App\Models\SafariWildlifeSight;
 use App\Models\User;
 use App\Models\WildLife;
@@ -206,6 +208,38 @@ class SafariSeeder extends Seeder
                     }
                 }
             }
+
+            // Create seasonal pricing (required for booking availability)
+            SeasonalPricing::create([
+                'safari_id' => $safari->id,
+                'season' => 'LOW',
+                'available_start_date' => now()->addMonths(1)->toDateString(),
+                'available_end_date' => now()->addMonths(3)->toDateString(),
+                'blocked_start_date' => null,
+                'blocked_end_date' => null,
+                'adult_price' => round($data['price'] * 0.8, 2),
+                'child_price' => round($data['price'] * 0.7 * 0.8, 2),
+            ]);
+
+            SeasonalPricing::create([
+                'safari_id' => $safari->id,
+                'season' => 'HIGH',
+                'available_start_date' => now()->addMonths(4)->toDateString(),
+                'available_end_date' => now()->addMonths(8)->toDateString(),
+                'blocked_start_date' => null,
+                'blocked_end_date' => null,
+                'adult_price' => $data['price'],
+                'child_price' => round($data['price'] * 0.7, 2),
+            ]);
+
+            // Create date range (required for booking date picker)
+            SafariDate::create([
+                'safari_id' => $safari->id,
+                'available_start_date' => now()->toDateString(),
+                'available_end_date' => now()->addYear()->toDateString(),
+                'blocked_start_date' => null,
+                'blocked_end_date' => null,
+            ]);
 
             // Create wildlife sightings
             if ($wildlife->isNotEmpty()) {
