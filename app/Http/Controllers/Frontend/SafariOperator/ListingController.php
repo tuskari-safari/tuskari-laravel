@@ -1753,7 +1753,7 @@ class ListingController extends Controller
 
     public function getCountries(Request $request)
     {
-        $countries = CountryGuide::where('region', $request->region_id)->get(['id', 'name']);
+        $countries = CountryGuide::where('region_id', $request->region_id)->get(['id', 'name']);
         return response()->json($countries);
     }
 
