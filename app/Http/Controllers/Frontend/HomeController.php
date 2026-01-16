@@ -26,15 +26,13 @@ use App\Models\SafariType;
 use App\Models\Testimonial;
 use App\Models\User;
 use App\Models\NationalParkAndReserves;
+use App\Models\PageMeta;
 use App\Models\Region;
 use App\Models\Safari;
 use App\Models\SafariBooking;
 use App\Models\Setting;
-use App\Models\Wallet;
-use App\Models\WalletTransaction;
 use App\Models\WebsiteRating;
 use App\Models\WildLife;
-use App\Models\WithdrawalRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,6 +50,7 @@ class HomeController extends Controller
         $cms = CmsManagement::whereIn('slug', ['what-is-tuskari', 'how-it-works', 'why-book-with-tuskari', 'trip-regions', 'operator-highlights'])
             ->get()
             ->keyBy('slug');
+        $meta = PageMeta::where('page_name', 'Homepage')->first();
         $testimonial = Testimonial::where('status', true)->latest()->get();
         $bottomBanner = BottomBanner::where('slug', 'homepage')->first();
         $regions = Region::with('countryGuides')->where('status', 1)->get();
@@ -69,7 +68,7 @@ class HomeController extends Controller
                 ->select('adult_price')
                 ->whereColumn('seasonal_pricings.safari_id', 'safaris.id')
                 ->where('seasonal_pricings.season', 'LOW')
-                ->orderBy('seasonal_pricings.id', 'asc') // or date if you want first chronologically
+                ->orderBy('seasonal_pricings.id', 'asc')
                 ->limit(1)])
             ->withAvg('safariReviews', 'rating')
             ->where('status', 1)
@@ -98,7 +97,7 @@ class HomeController extends Controller
                 ];
             });
 
-        return Inertia::render('Frontend/index', ['homeBanner' => $homeBanner, 'cms' => $cms, 'testimonial' => $testimonial, 'bottomBanner' => $bottomBanner, 'destinations' => $mostPopularDestinations, 'featuredSafaris' => $featuredSafaris, 'countryGuides' => $countryGuides, 'regions' => $regions]);
+        return Inertia::render('Frontend/index', ['homeBanner' => $homeBanner, 'cms' => $cms, 'testimonial' => $testimonial, 'bottomBanner' => $bottomBanner, 'destinations' => $mostPopularDestinations, 'featuredSafaris' => $featuredSafaris, 'countryGuides' => $countryGuides, 'regions' => $regions, 'meta' => $meta]);
     }
 
     public function safariListings(Request $request)
@@ -109,12 +108,15 @@ class HomeController extends Controller
                     ->select('adult_price')
                     ->whereColumn('seasonal_pricings.safari_id', 'safaris.id')
                     ->where('seasonal_pricings.season', 'LOW')
-                    ->orderBy('seasonal_pricings.id', 'asc') // or date if you want first chronologically
+                    ->orderBy('seasonal_pricings.id', 'asc')
                     ->limit(1)])
                 ->with('dateRange', 'seasonal_pricings')
                 ->withAvg('safariReviews', 'rating')
                 ->where('status', 1)
                 ->where('is_approved', 1);
+
+            $meta = PageMeta::where('page_name', 'Safari')->first();
+
 
             if ($request->has('location') && !empty($request->location)) {
                 $locations = $request->location;
@@ -142,13 +144,6 @@ class HomeController extends Controller
                     $query->whereRaw('(no_of_adult + no_of_child) >= ?', [$travelers]);
                 }
             }
-
-            // if($request->has('type') && !empty($request->type)){
-            //     $type = trim($request->type);
-            //       $query->whereHas('create_safari_type.type', function ($q) use ($type) {
-            //          $q->where('title', 'LIKE', "%$type%");
-            //     });
-            // }
 
             if ($request->collection_id) {
                 $query->whereHas('collections', function ($q) use ($request) {
@@ -230,7 +225,6 @@ class HomeController extends Controller
                 });
             }
 
-
             if ($request->filled('seasons') && is_array($request->seasons)) {
                 $seasons = array_filter($request->seasons);
                 if (!empty($seasons)) {
@@ -244,14 +238,6 @@ class HomeController extends Controller
                 }
             }
 
-
-
-            // if ($request->filled('destinations') && is_array($request->destinations)) {
-            //     $destinations = array_filter($request->destinations);
-            //     if (!empty($destinations)) {
-            //         $query->whereIn('destination', $destinations);
-            //     }
-            // }
 
             if ($request->filled('safariTypeIds') && is_array($request->safariTypeIds)) {
                 $safariTypeIds = array_filter($request->safariTypeIds);
@@ -299,10 +285,8 @@ class HomeController extends Controller
                 if (!empty($landscapes)) {
                     $query->where(function ($q) use ($landscapes) {
                         foreach ($landscapes as $landscape) {
-                            // remove backslashes then try to match either "Value" (quoted JSON) or plain Value (fallback)
                             $quotedPattern = '%"' . $landscape . '"%';
                             $plainPattern  = '%'  . $landscape . '%';
-
                             $q->orWhereRaw(
                                 "(REPLACE(environment, '\\\\', '') LIKE ? OR REPLACE(environment, '\\\\', '') LIKE ?)",
                                 [$quotedPattern, $plainPattern]
@@ -372,7 +356,7 @@ class HomeController extends Controller
             });
             $tags = AvailableTag::where('show_in_frontend', true)->get(['id', 'name']);
 
-            return Inertia::render('Frontend/safari-listing', ['safaris' => $safaris, 'safariTypes' => $safariTypes, 'experiences' => $experiences, 'activities' => $activities, 'countryGuides' => $countryGuides, 'collections' => $collections, 'wildlives' => $wildlives, 'tags' => $tags]);
+            return Inertia::render('Frontend/safari-listing', ['safaris' => $safaris, 'safariTypes' => $safariTypes, 'experiences' => $experiences, 'activities' => $activities, 'countryGuides' => $countryGuides, 'collections' => $collections, 'wildlives' => $wildlives, 'tags' => $tags, 'meta' => $meta]);
         } catch (\Exception $e) {
             Log::error(" :: EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
             abort(500);
@@ -393,7 +377,7 @@ class HomeController extends Controller
                         ->select('adult_price')
                         ->whereColumn('seasonal_pricings.safari_id', 'safaris.id')
                         ->where('seasonal_pricings.season', 'LOW')
-                        ->orderBy('seasonal_pricings.id', 'asc') // or date if you want first chronologically
+                        ->orderBy('seasonal_pricings.id', 'asc')
                         ->limit(1)])
                     ->withAvg('safariReviews', 'rating')
                     ->where('status', 1)
@@ -408,7 +392,7 @@ class HomeController extends Controller
                         ->select('adult_price')
                         ->whereColumn('seasonal_pricings.safari_id', 'safaris.id')
                         ->where('seasonal_pricings.season', 'LOW')
-                        ->orderBy('seasonal_pricings.id', 'asc') // or date if you want first chronologically
+                        ->orderBy('seasonal_pricings.id', 'asc')
                         ->limit(1)])
                     ->withAvg('safariReviews', 'rating')
                     ->where('status', 1)
@@ -428,7 +412,7 @@ class HomeController extends Controller
                         $safari->chat_room_id = $member->chat_room_id;
                     }
                 }
-                $operatorId = $safari->user_id; // or an array if multiple operators
+                $operatorId = $safari->user_id;
                 $allMessages = Message::orderBy('chat_room_id')
                     ->orderBy('created_at')
                     ->get()
@@ -446,10 +430,8 @@ class HomeController extends Controller
                     }
 
                     if ($msg['user_id'] != $operatorId) {
-                        // User message
                         $chatRooms[$roomId]['last_user_message_time'] = $msg['created_at'];
                     } else {
-                        // Operator response
                         if ($chatRooms[$roomId]['last_user_message_time']) {
                             $userTime = strtotime($chatRooms[$roomId]['last_user_message_time']);
                             $operatorTime = strtotime($msg['created_at']);
@@ -459,15 +441,12 @@ class HomeController extends Controller
                                     $minResponseTime = $diffSeconds;
                                 }
                             }
-                            // After pairing, reset
                             $chatRooms[$roomId]['last_user_message_time'] = null;
                         }
                     }
                 }
 
-
                 if (!is_null($minResponseTime)) {
-                    // Just assign seconds directly
                     $safari->fastest_reply_time = $minResponseTime; // total seconds (int)
                 }
 
@@ -557,7 +536,6 @@ class HomeController extends Controller
         }
     }
 
-
     public function story()
     {
         try {
@@ -579,7 +557,8 @@ class HomeController extends Controller
             $blogs = Blog::where('status', true)->paginate(6)->withQueryString();
             $blogCategories = Category::where('status', true)->get();
             $featureBlogs = Blog::where('status', true)->latest()->take(5)->get();
-            return Inertia::render('Frontend/blog-listing', compact('blogs', 'blogCategories', 'featureBlogs'));
+            $meta = PageMeta::where('page_name', 'Blog Listing')->first();
+            return Inertia::render('Frontend/blog-listing', compact('blogs', 'blogCategories', 'featureBlogs', 'meta'));
         } catch (\Throwable $e) {
             Log::error(" :: EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
             abort(500);
@@ -594,7 +573,8 @@ class HomeController extends Controller
             })->where('status', true)->paginate(6)->withQueryString();
             $blogCategories = Category::where('status', true)->get();
             $featureBlogs = Blog::where('status', true)->latest()->take(5)->get();
-            return Inertia::render('Frontend/blog-listing', compact('blogs', 'blogCategories', 'featureBlogs'));
+            $meta = PageMeta::where('page_name', 'Blog Listing')->first();
+            return Inertia::render('Frontend/blog-listing', compact('blogs', 'blogCategories', 'featureBlogs', 'meta'));
         } catch (\Throwable $e) {
             Log::error(" :: EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
             abort(500);
@@ -605,10 +585,11 @@ class HomeController extends Controller
     {
         try {
             $blog = Blog::where('title', urldecode($title))->first();
+            $meta = PageMeta::where('page_name', 'Blog Details')->first();
             if ($blog) {
                 $blogCategories = Category::where('status', true)->get();
                 $featureBlogs = Blog::where('status', true)->latest()->take(5)->get();
-                return Inertia::render('Frontend/blog-details', compact('blog', 'blogCategories', 'featureBlogs'));
+                return Inertia::render('Frontend/blog-details', compact('blog', 'blogCategories', 'featureBlogs', 'meta'));
             } else {
                 return redirect()->route('frontend.blogs')->with('success', 'Blog not found.');
             }
@@ -622,11 +603,10 @@ class HomeController extends Controller
     {
         $contactInfo = ContactInfo::first();
         $faqs = Faq::where('active', true)->get();
-        $faqChunks = $faqs->split(2); // returns a collection with 2 parts
+        $faqChunks = $faqs->split(2);
 
         $faqPart1 = $faqChunks->get(0);
         $faqPart2 = $faqChunks->get(1);
-
 
         if ($request->isMethod('post')) {
             $validated = $request->validate([
@@ -644,33 +624,7 @@ class HomeController extends Controller
         return Inertia::render('Frontend/contact-us', compact('contactInfo', 'faqPart1', 'faqPart2'));
     }
 
-    // public function countryGuide()
-    // {
-    //     try {
-    //         $cms = CmsManagement::whereIn('slug', ['where-safari-born', 'mara-region', 'laikipia-and-northern-kenya', 'kenyan-coast'])
-    //             ->get()
-    //             ->keyBy('slug');
-    //         $nationalParks = NationalParkAndReserves::where('status', 1)->whereType('national_park')->where('location', 'Kenya')->latest()->limit(5)->get();
-    //         $keyExperiences = KeyExperience::latest()->limit(5)->get();
-    //         $footerBanner = BottomBanner::where('page_name', 'Country Guide')->first();
-
-    //         $featuredSafaris = Safari::with('safariType')
-    //             ->select('safaris.*', DB::raw('(price_for_adult + price_for_child) as total_price'))
-    //             ->withAvg('safariReviews', 'rating')
-    //             ->where('status', 1)
-    //             ->where('is_approved', 1)
-    //             ->latest()
-    //             ->take(4)
-    //             ->get();
-
-    //         return Inertia::render('Frontend/country-guide', ['cms' => $cms, 'nationalParks' => $nationalParks, 'keyExperiences' => $keyExperiences, 'footerBanner' => $footerBanner, 'featuredSafaris' => $featuredSafaris]);
-    //     } catch (\Throwable $e) {
-    //         Log::error(" :: EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
-    //         abort(500);
-    //     }
-    // }
-
-    public function countryGuideDetails(Request $request, $name)
+    public function countryGuideDetails($name)
     {
         try {
             $country = CountryGuide::where('name', 'LIKE', "%$name%")->first();
@@ -685,11 +639,11 @@ class HomeController extends Controller
                 $featuredSafaris = Safari::with('safariType', 'country')
                     ->where('country_id', $country->id)
                     ->addSelect(['total_price' => DB::table('seasonal_pricings')
-                    ->select('adult_price')
-                    ->whereColumn('seasonal_pricings.safari_id', 'safaris.id')
-                    ->where('seasonal_pricings.season', 'LOW')
-                    ->orderBy('seasonal_pricings.id', 'asc') // or date if you want first chronologically
-                    ->limit(1)])
+                        ->select('adult_price')
+                        ->whereColumn('seasonal_pricings.safari_id', 'safaris.id')
+                        ->where('seasonal_pricings.season', 'LOW')
+                        ->orderBy('seasonal_pricings.id', 'asc')
+                        ->limit(1)])
                     ->withAvg('safariReviews', 'rating')
                     ->where('status', 1)
                     ->where('is_approved', 1)
@@ -697,11 +651,13 @@ class HomeController extends Controller
                     ->take(4)
                     ->get();
             }
+            $meta = PageMeta::where('page_name', 'Country Guide')->first();
 
             return Inertia::render('Frontend/country-guide', [
                 'nationalParks' => $nationalParks ?? [],
                 'country' => $country,
-                'featuredSafaris' => $featuredSafaris ?? []
+                'featuredSafaris' => $featuredSafaris ?? [],
+                'meta' => $meta
             ]);
         } catch (\Throwable $e) {
             Log::error(" :: EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
@@ -709,17 +665,19 @@ class HomeController extends Controller
         }
     }
 
-    public function countryGuide(Request $request)
+    public function countryGuide()
     {
         try {
             $countries = CountryGuide::select('id', 'name', 'subtitle', 'thumbnail')
-            ->where('status', 1)
-            ->latest()
-            ->paginate(20)
-            ->withQueryString();
+                ->where('status', 1)
+                ->latest()
+                ->paginate(20)
+                ->withQueryString();
+            $meta = PageMeta::where('page_name', 'Country Guide')->first();
 
             return Inertia::render('Frontend/country-guides', [
                 'countries' => $countries,
+                'meta' => $meta
             ]);
         } catch (\Throwable $e) {
             Log::error(" :: EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
@@ -754,10 +712,12 @@ class HomeController extends Controller
                 ->latest()
                 ->paginate(20)
                 ->withQueryString();
+            $meta = PageMeta::where('page_name', 'National Park')->first();
 
             return Inertia::render('Frontend/national-parks', [
                 'parksReserves' => $query,
-                'regionData' => $regionData
+                'regionData' => $regionData,
+                'meta' => $meta
             ]);
         } catch (\Throwable $e) {
             Log::error(" :: EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
@@ -808,7 +768,8 @@ class HomeController extends Controller
         try {
             $safariTypes = SafariType::get();
             $footerBanner = BottomBanner::where('page_name', 'Safari Style')->first();
-            return Inertia::render('Frontend/safari-type', compact('safariTypes', 'footerBanner'));
+            $meta = PageMeta::where('page_name', 'Safari Style')->first();
+            return Inertia::render('Frontend/safari-type', compact('safariTypes', 'footerBanner', 'meta'));
         } catch (\Throwable $e) {
             Log::error(" :: EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
             abort(500);
@@ -818,17 +779,18 @@ class HomeController extends Controller
     public function operators()
     {
         $banner = Banner::where('page_name', 'Operator')->first();
+        $meta = PageMeta::where('page_name', 'Operator')->first();
         $cms = CmsManagement::whereIn('slug', ['why-join-tuskari', 'how-it-works', 'what-you-can-list', 'built-for-you', 'more-of-the-money-goes'])
             ->get()
             ->keyBy('slug');
         $faqs = Faq::where('active', true)->get();
-        $faqChunks = $faqs->split(2); // returns a collection with 2 parts
+        $faqChunks = $faqs->split(2);
 
         $faqPart1 = $faqChunks->get(0);
         $faqPart2 = $faqChunks->get(1);
         $footerBanner = BottomBanner::where('page_name', 'Operator')->first();
 
-        return Inertia::render('Frontend/operator', ['banner' => $banner, 'cms' => $cms, 'faqPart1' => $faqPart1, 'faqPart2' => $faqPart2, 'footerBanner' => $footerBanner]);
+        return Inertia::render('Frontend/operator', ['banner' => $banner, 'cms' => $cms, 'faqPart1' => $faqPart1, 'faqPart2' => $faqPart2, 'footerBanner' => $footerBanner, 'meta' => $meta]);
     }
 
     public function getBanner(Request $request)
@@ -861,11 +823,11 @@ class HomeController extends Controller
 
             $featuredSafaris = Safari::with('safariType')
                 ->addSelect(['total_price' => DB::table('seasonal_pricings')
-                ->select('adult_price')
-                ->whereColumn('seasonal_pricings.safari_id', 'safaris.id')
-                ->where('seasonal_pricings.season', 'LOW')
-                ->orderBy('seasonal_pricings.id', 'asc') // or date if you want first chronologically
-                ->limit(1)])
+                    ->select('adult_price')
+                    ->whereColumn('seasonal_pricings.safari_id', 'safaris.id')
+                    ->where('seasonal_pricings.season', 'LOW')
+                    ->orderBy('seasonal_pricings.id', 'asc') // or date if you want first chronologically
+                    ->limit(1)])
                 ->withAvg('safariReviews', 'rating')
                 ->where('status', 1)
                 ->where('is_approved', 1)
@@ -926,10 +888,7 @@ class HomeController extends Controller
             'title' => ['required'],
         ]);
         try {
-            $shareButtons = \Share::page(
-                $request->url,
-                $request->title
-            )
+            $shareButtons = \Share::page($request->url, $request->title)
                 ->facebook()
                 ->twitter()
                 ->whatsapp()
@@ -955,7 +914,6 @@ class HomeController extends Controller
         ]);
     }
 
-
     public function headerCountries()
     {
         $countries = CountryGuide::withCount('safaris')
@@ -968,13 +926,11 @@ class HomeController extends Controller
     public function headerNationalParks()
     {
         $parks = NationalParkAndReserves::whereHas('safari_parks.safari')
-            ->withCount([
-                'safari_parks as safari_count' => function ($q) {
-                    $q->whereHas('safari', function ($q2) {
-                        $q2->where('is_approved', 1);
-                    });
-                }
-            ])
+            ->withCount(['safari_parks as safari_count' => function ($q) {
+                $q->whereHas('safari', function ($q2) {
+                    $q2->where('is_approved', 1);
+                });
+            }])
             ->orderByDesc('safari_count')
             ->limit(6)
             ->where('is_hidden', false)
@@ -985,16 +941,15 @@ class HomeController extends Controller
     public function headerSafariType()
     {
         $types = SafariType::whereHas('create_safari_types.safari')
-            ->withCount([
-                'create_safari_types as safari_count' => function ($q) {
-                    $q->whereHas('safari', function ($q2) {
-                        $q2->where('is_approved', 1);
-                    });
-                }
-            ])
+            ->withCount(['create_safari_types as safari_count' => function ($q) {
+                $q->whereHas('safari', function ($q2) {
+                    $q2->where('is_approved', 1);
+                });
+            }])
             ->orderByDesc('safari_count')
             ->take(6)
             ->get(['id', 'title']);
+            
         return response()->json($types);
     }
     public function headerBlogCategories()
@@ -1016,33 +971,38 @@ class HomeController extends Controller
 
         $faqPart1 = $faqChunks->get(0);
         $faqPart2 = $faqChunks->get(1);
+        $meta = PageMeta::where('page_name', 'faq')->first();
 
-        return Inertia::render('Frontend/Faq', ['faqPart1' => $faqPart1, 'faqPart2' => $faqPart2]);
+        return Inertia::render('Frontend/Faq', ['faqPart1' => $faqPart1, 'faqPart2' => $faqPart2, 'meta' => $meta]);
     }
 
     public function ourStory()
     {
         $cms = Cms::where('slug', 'our-story')->first();
+        $meta = PageMeta::where('page_name', 'Our Story')->first();
 
-        return Inertia::render('Frontend/ourStory', ['cms' => $cms]);
+        return Inertia::render('Frontend/ourStory', ['cms' => $cms, 'meta' => $meta]);
     }
 
     public function howItWorks()
     {
         $cms = Cms::where('slug', 'how-it-works')->first();
+        $meta = PageMeta::where('page_name', 'How It Works')->first();
 
-        return Inertia::render('Frontend/howItWorks', ['cms' => $cms]);
+        return Inertia::render('Frontend/howItWorks', ['cms' => $cms, 'meta' => $meta]);
     }
 
     public function whyItsDifferent()
     {
         $cms = Cms::where('slug', 'why-it-different')->first();
-        return Inertia::render('Frontend/whyItsDifferent', ['cms' => $cms]);
+        $meta = PageMeta::where('page_name', 'Why It Different')->first();
+        return Inertia::render('Frontend/whyItsDifferent', ['cms' => $cms, 'meta' => $meta]);
     }
 
     public function responsibleTravel()
     {
         $cms = Cms::where('slug', 'responsible-travel')->first();
-        return Inertia::render('Frontend/responsibleTravel', ['cms' => $cms]);
+        $meta = PageMeta::where('page_name', 'responsible-travel')->first();
+        return Inertia::render('Frontend/responsibleTravel', ['cms' => $cms, 'meta' => $meta]);
     }
 }

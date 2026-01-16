@@ -15352,6 +15352,11 @@ span.msgwrap-txt {
     padding-top: 6px;
 }
 
+/* 1.12.25 */
+.homebnrsec{
+min-height: calc(100vh - 40px) !important;
+}
+/* 1.12.25 */
 /* ========== responsive css =========== */
 
 
@@ -20381,6 +20386,12 @@ span.msgwrap-txt {
     }
 
     /*support css update 14/10/2025*/
+
+/* 1.12.25 */
+.homebnrsec{
+min-height: 600px !important;
+}
+/* 1.12.25 */
 }
 
 /*support css upate 10/10/2025*/
@@ -21149,6 +21160,12 @@ span.msgwrap-txt {
     }
 
     /*support css update 14/10/2025*/
+    /* 1.12.25 */
+    .homebnrsec {
+    min-height: 550px !important;
+}
+    /* 1.12.25 */
+
 
 }
 

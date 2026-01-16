@@ -269,10 +269,11 @@ import { homeJs } from "@/custom.js";
 import Pagination from '@/components/customPaginate.vue';
 import ListHelper from "@/helpers/ListHelper";
 import { router } from '@inertiajs/vue3';
-import { debounce, pickBy } from 'lodash';
+import _ from 'lodash';
+const { debounce, pickBy } = _;
 import Loading from 'vue-loading-overlay';
 import Multiselect from '@vueform/multiselect';
-const params = () => new URLSearchParams(window.location.search);
+const params = () => new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
 
 const props = defineProps({
     bookings: Object,

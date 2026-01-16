@@ -75,7 +75,7 @@
                             <li class="kt-menu__item " :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/user') }"
                                 aria-haspopup="true">
                                 <Link :href="route('admin.users')" :preserve-scroll="true" class="kt-menu__link">
-                                <Icon icon="heroicons:users" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="heroicons:users-solid" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
 
                                 <span class="kt-menu__link-text">Customers</span>
                                 </Link>
@@ -83,7 +83,7 @@
                             <li class="kt-menu__item " :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/vendor') }"
                                 aria-haspopup="true">
                                 <Link :href="route('admin.vendors')" :preserve-scroll="true" class="kt-menu__link">
-                                <Icon icon="mdi:store" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:storefront" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
 
                                 <span class="kt-menu__link-text">Vendors/Providers</span>
                                 </Link>
@@ -91,7 +91,7 @@
                             <li class="kt-menu__item " :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/withdrawal_requests') }"
                                 aria-haspopup="true">
                                 <Link :href="route('admin.withdrawal-requests.index')" :preserve-scroll="true" class="kt-menu__link">
-                                <Icon icon="heroicons:banknotes" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:payments" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
 
                                 <span class="kt-menu__link-text">Withdrawal Requests</span>
                                 </Link>
@@ -123,7 +123,7 @@
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/key_experience') }"
                                 aria-haspopup="true">
                                 <Link :href="route('admin.key-experience.index')" :preserve-scroll="true" class="kt-menu__link ">
-                                <Icon icon="heroicons:star" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:star" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Key Experience</span>
                                 </Link>
                             </li>
@@ -131,7 +131,7 @@
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/activity') }"
                                 aria-haspopup="true">
                                 <Link :href="route('admin.activity.index')" :preserve-scroll="true" class="kt-menu__link ">
-                                <Icon icon="mdi:run" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:directions-run" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Activity</span>
                                 </Link>
                             </li>
@@ -139,7 +139,7 @@
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/Safari_type') }"
                                 aria-haspopup="true">
                                 <Link :href="route('admin.safari-type.index')" :preserve-scroll="true" class="kt-menu__link ">
-                                <Icon icon="mdi:binoculars" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:visibility" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Safari Type</span>
                                 </Link>
                             </li>
@@ -147,7 +147,7 @@
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/wild_life') }"
                                 aria-haspopup="true">
                                 <Link :href="route('admin.wild-lives')" :preserve-scroll="true" class="kt-menu__link ">
-                                <Icon icon="game-icons:elephant" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:pets" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Wild Life</span>
                                 </Link>
                             </li>
@@ -155,7 +155,7 @@
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/region') }"
                                 aria-haspopup="true">
                                 <Link :href="route('admin.region.index')" :preserve-scroll="true" class="kt-menu__link ">
-                                <Icon icon="heroicons:map-pin" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:location-on" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Regions</span>
                                 </Link>
                             </li>
@@ -187,7 +187,7 @@
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/country_guide') }"
                                 aria-haspopup="true">
                                 <Link :href="route('admin.country-guides')" :preserve-scroll="true" class="kt-menu__link ">
-                                <Icon icon="heroicons:map" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:map" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Country Guides</span>
                                 </Link>
                             </li>
@@ -201,7 +201,7 @@
                               <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/booking') }"
                                 aria-haspopup="true">
                                 <Link :href="route('admin.booking.index')" :preserve-scroll="true" class="kt-menu__link ">
-                                <Icon icon="heroicons:calendar-days" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:calendar-month" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Booking/Transaction</span>
                                 </Link>
                             </li>
@@ -215,14 +215,14 @@
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/category') }"
                                 aria-haspopup="true">
                                 <Link :href="route('admin.category.index')" :preserve-scroll="true" class="kt-menu__link ">
-                                <Icon icon="heroicons:tag" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:label" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Blog Category</span>
                                 </Link>
                             </li>
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/blog') }"
                                 aria-haspopup="true">
                                 <Link href="/admin/blogs" class="kt-menu__link" :preserve-scroll="true">
-                                <Icon icon="heroicons:document-text" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:article" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Blogs</span>
                                 </Link>
                             </li>
@@ -236,14 +236,14 @@
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/cms') }"
                                 aria-haspopup="true">
                                 <Link href="/admin/cms" class="kt-menu__link" :preserve-scroll="true">
-                                <Icon icon="heroicons:document-duplicate" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:content-copy" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">CMS Pages</span>
                                 </Link>
                             </li>
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/Pages') }"
                                 aria-haspopup="true">
                                 <Link :href="route('admin.create-edit-pages')" class="kt-menu__link" :preserve-scroll="true">
-                                <Icon icon="heroicons:pencil-square" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:edit" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Pages</span>
                                 </Link>
                             </li>
@@ -251,15 +251,23 @@
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/banner') }"
                                 aria-haspopup="true">
                                 <Link :href="route('admin.banner_list')" class="kt-menu__link" :preserve-scroll="true">
-                                <Icon icon="heroicons:photo" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:image" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Banner</span>
+                                </Link>
+                            </li>
+
+                            <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/uploads') }"
+                                aria-haspopup="true">
+                                <Link :href="route('admin.uploads.index')" class="kt-menu__link" :preserve-scroll="true">
+                                <Icon icon="material-symbols:upload" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <span class="kt-menu__link-text">Uploads</span>
                                 </Link>
                             </li>
 
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/bottom_banner') }"
                                 aria-haspopup="true">
                                 <Link :href="route('admin.bottom-banner-list')" class="kt-menu__link" :preserve-scroll="true">
-                                <Icon icon="heroicons:rectangle-stack" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:layers" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Bottom Banner</span>
                                 </Link>
                             </li>
@@ -267,21 +275,27 @@
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/Testimonial') }"
                                 aria-haspopup="true">
                                 <Link href="/admin/testimonial" class="kt-menu__link" :preserve-scroll="true">
-                                <Icon icon="heroicons:chat-bubble-left-right" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:chat" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Testimonial</span>
                                 </Link>
                             </li>
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/OperatorReview') }"
                                 aria-haspopup="true">
                                 <Link href="/admin/operator-review" class="kt-menu__link" :preserve-scroll="true">
-                                <Icon icon="heroicons:star" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:rate-review" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Operator Reviews</span>
                                 </Link>
                             </li>
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/faq') }" aria-haspopup="true">
                                 <Link :href="route('admin.faq.index')" class="kt-menu__link" :preserve-scroll="true">
-                                <Icon icon="heroicons:question-mark-circle" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:help" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">FAQ</span>
+                                </Link>
+                            </li>
+                            <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/page_meta') }" aria-haspopup="true">
+                                <Link :href="route('admin.page-meta.index')" class="kt-menu__link" :preserve-scroll="true">
+                                <Icon icon="material-symbols:search" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <span class="kt-menu__link-text">Page Meta</span>
                                 </Link>
                             </li>
                             <li class="kt-menu__section ">
@@ -291,44 +305,44 @@
                             </li>
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/help_support') }" aria-haspopup="true">
                                 <Link :href="route('admin.help-support.index')" class="kt-menu__link" preserve-scroll>
-                                <Icon icon="heroicons:lifebuoy" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:support" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Help And Support</span>
                                 </Link>
                             </li>
 
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/contact_us') }" aria-haspopup="true">
                                 <Link :href="route('admin.contact-us')" class="kt-menu__link" :preserve-scroll="true">
-                                <Icon icon="heroicons:envelope" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                <Icon icon="material-symbols:mail" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                 <span class="kt-menu__link-text">Contact Us</span>
                                 </Link>
                             </li>
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/contact_info') }" aria-haspopup="true">
                                 <Link :href="route('admin.update.contact-info')" class="kt-menu__link" :preserve-scroll="true">
-                                    <Icon icon="heroicons:information-circle" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                    <Icon icon="material-symbols:info" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                     <span class="kt-menu__link-text">Contact Information</span>
                                 </Link>
                             </li>
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/something_didnt_work') }" aria-haspopup="true">
                                 <Link :href="route('admin.something-did-not-work.index')" class="kt-menu__link" :preserve-scroll="true">
-                                    <Icon icon="heroicons:exclamation-triangle" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                    <Icon icon="material-symbols:warning" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                     <span class="kt-menu__link-text">Something didn't work Report</span>
                                 </Link>
                             </li>
                              <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/report_issue') }" aria-haspopup="true">
                                 <Link :href="route('admin.report-issue.index')" class="kt-menu__link" :preserve-scroll="true">
-                                    <Icon icon="heroicons:flag" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                    <Icon icon="material-symbols:flag" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                     <span class="kt-menu__link-text">Report A Problem</span>
                                 </Link>
                             </li>
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/WebsiteRating') }" aria-haspopup="true">
                                 <Link :href="route('admin.website-rating.list')" class="kt-menu__link" :preserve-scroll="true">
-                                    <Icon icon="heroicons:star" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                    <Icon icon="material-symbols:star-rate" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                     <span class="kt-menu__link-text">Website Ratings</span>
                                 </Link>
                             </li>
                             <li class="kt-menu__item" :class="{ 'kt-menu__item--active': $page.component.startsWith('Admin/settings') }" aria-haspopup="true">
                                 <Link :href="route('admin.settings.edit')" class="kt-menu__link" :preserve-scroll="true">
-                                    <Icon icon="heroicons:cog-6-tooth" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
+                                    <Icon icon="material-symbols:settings" color="white" width="20" height="20" class="kt-menu__link-icon mr-3" />
                                     <span class="kt-menu__link-text">Settings</span>
                                 </Link>
                             </li>
@@ -374,108 +388,3 @@ emit.on('toggleMobileMenu', function (arg1) {
 });
 
 </script>
-
-<style scoped>
-/* Menu Items */
-.kt-menu__item {
-    margin: 4px 12px !important;
-    border-radius: 12px !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    position: relative !important;
-}
-
-/* Menu Links */
-.kt-menu__link {
-    padding: 14px 20px !important;
-    border-radius: 12px !important;
-    transition: all 0.3s ease !important;
-    position: relative !important;
-    border: 1px solid transparent !important;
-    display: flex !important;
-    align-items: center !important;
-}
-
-.kt-menu__link:hover {
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
-    transform: translateX(3px) !important;
-}
-
-/* Active State */
-.kt-menu__item--active .kt-menu__link {
-    box-shadow: 0 6px 20px rgba(55, 48, 163, 0.4) !important;
-    transform: translateX(4px) !important;
-}
-
-.kt-menu__item--active .kt-menu__link::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 30%;
-    background: #2f3a2f;
-    border-radius: 0 4px 4px 0;
-}
-
-/* Icons */
-.kt-menu__link-icon {
-    margin-right: 14px !important;
-    transition: all 0.3s ease !important;
-}
-
-.kt-menu__item--active .kt-menu__link-icon,
-.kt-menu__link:hover .kt-menu__link-icon {
-    transform: scale(1.1) !important;
-}
-
-/* Text */
-.kt-menu__link-text {
-    font-weight: 500 !important;
-    font-size: 14px !important;
-    letter-spacing: 0.3px !important;
-    transition: all 0.3s ease !important;
-}
-
-.kt-menu__item--active .kt-menu__link-text,
-.kt-menu__link:hover .kt-menu__link-text {
-    font-weight: 600 !important;
-}
-
-/* Section Headers */
-.kt-menu__section-text {
-    font-size: 12px !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.8px !important;
-    opacity: 0.8 !important;
-}
-
-/* Animations */
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.kt-menu__item {
-    animation: slideIn 0.4s ease forwards;
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
-    .kt-menu__link {
-        padding: 12px 16px !important;
-    }
-
-    .kt-menu__link-text {
-        font-size: 13px !important;
-    }
-}
-</style>

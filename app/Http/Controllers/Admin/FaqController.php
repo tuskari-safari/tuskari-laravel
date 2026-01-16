@@ -12,7 +12,6 @@ class FaqController extends Controller
 {
     public function index(Request $request)
     {
-        
         $faq = Faq::query();
 
         if ($request->question) {
@@ -47,12 +46,6 @@ class FaqController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $request->validate(
@@ -73,12 +66,6 @@ class FaqController extends Controller
         return redirect()->route('admin.faq.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         try {
@@ -90,25 +77,15 @@ class FaqController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        $request->validate(
-            [
-                'question' => 'required|max:500',
-                'answer' => 'required|max:500',
-                'active' => 'required',
-            ],
-            [
-                'active.required'    => 'The status field is required',
-            ]
-        );
+        $request->validate([
+            'question' => 'required|max:500',
+            'answer' => 'required|max:500',
+            'active' => 'required',
+        ],            [
+            'active.required'    => 'The status field is required',
+        ]);
 
         try {
             $faq = Faq::find($id);
@@ -122,12 +99,6 @@ class FaqController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         try {
@@ -139,7 +110,6 @@ class FaqController extends Controller
             abort(500);
         }
     }
-
 
     public function changeFaqStatus(Request $request)
     {

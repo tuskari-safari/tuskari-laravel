@@ -34,6 +34,11 @@ const isLoading = ref(false);
 
 watch(() => props.pageName,
     async (newVal) => {
+        // Skip API call during SSR
+        if (typeof window === 'undefined') {
+            return;
+        }
+        
         try {
             isLoading.value = true;
             bannerData.value = null;

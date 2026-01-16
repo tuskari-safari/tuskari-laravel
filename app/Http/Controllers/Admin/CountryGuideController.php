@@ -341,7 +341,6 @@ class CountryGuideController extends Controller
                         'title' => $item['title'],
                         'subtitle' => $item['subtitle'],
                         'image' => $imageUrl ? url($imageUrl) : $fullUrl,
-                        // 'align' => $item['align'] ?? null,
                     ];
                 }
                 $country->content_details = !empty($details) ? json_encode($details) : null;

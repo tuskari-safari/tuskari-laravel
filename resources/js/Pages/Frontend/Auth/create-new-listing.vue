@@ -8,8 +8,7 @@
             </div>
         </div>
         <div class="crtelisting-hdwrap">
-            <div class="crtelisting-heading text-center">If you want to pause filling out the form, click
-                <strong>Save</strong> after completing any step to save your progress.
+            <div class="crtelisting-heading text-center">To submit your safari successfully, you need to save each section as you go. Saving also allows you to return later and complete your listing
             </div>
         </div>
 

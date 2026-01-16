@@ -1,4 +1,5 @@
 <template>
+    <Meta :cms="props.meta" />
     <Banner pageName="Safari Style" />
     <div class="safari-style-sec cmn-gap">
         <div class="container">
@@ -141,10 +142,12 @@
 import Banner from '@/components/Frontend/Banner.vue';
 import { homeJs } from "@/custom.js";
 import { onMounted } from 'vue';
+import Meta from '../../components/Frontend/Meta.vue';
 
 const props = defineProps({
     safariTypes: Object,
     footerBanner: Object,
+    meta: Object
 });
 
 onMounted(() => {

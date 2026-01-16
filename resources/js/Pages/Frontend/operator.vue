@@ -1,6 +1,6 @@
 <template>
+    <Meta :cms="props.meta" />
     <Banner pageName="Operator" />
-
     <!-- why travel with us section start  -->
     <div class="sty-travel-us cmn-gap operatorpage pb-0">
         <div class="container">
@@ -215,13 +215,15 @@
 import Banner from '@/components/Frontend/Banner.vue';
 import { onMounted } from 'vue'
 import { homeJs } from "@/custom.js";
+import Meta from '../../components/Frontend/Meta.vue';
 
 const props = defineProps({
     cms: Object,
     banner: Object,
     faqPart1: Object,
     faqPart2: Object,
-    footerBanner: Object
+    footerBanner: Object,
+    meta: Object
 });
 onMounted(() => {
     homeJs();

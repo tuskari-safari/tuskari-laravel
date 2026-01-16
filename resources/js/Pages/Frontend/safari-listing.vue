@@ -1,4 +1,5 @@
 <template>
+    <Meta :cms="props.meta" />
     <Banner pageName="Safari" />
     <div class="safr-list-frmwrpr">
         <div class="bnr-form-lft">
@@ -21,8 +22,9 @@
                                 </div>
                                 <div class="bnrfrm-fld bnrfrm-fld-2">
                                     <div class="bnrfrm-inputwrp date datefrmat">
-                                            <DateRange v-model="form.dateRange" :minDate="new Date()" :format="formatDate" />
-                                        </div>
+                                        <DateRange v-model="form.dateRange" :minDate="new Date()"
+                                            :format="formatDate" />
+                                    </div>
                                 </div>
                                 <div class="bnrfrm-fld bnrfrm-fld-3">
                                     <div class="bnrfrm-inputwrp">
@@ -76,9 +78,9 @@
                                         </div>
                                     </div>
 
-                                     <div class="fltr-trv-qunttybx">
-                                          <button type="button" class="cmn-butn" @click="visible = !visible">Done</button>
-                                        </div>
+                                    <div class="fltr-trv-qunttybx">
+                                        <button type="button" class="cmn-butn" @click="visible = !visible">Done</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -275,8 +277,7 @@
                             </div>
                             <div class="ftrppup-checkbx-col">
                                 <label class="ftrppup-chkbx-lbl">
-                                    <input type="checkbox" name="season" value="Shoulder Season"
-                                        v-model="form.seasons">
+                                    <input type="checkbox" name="season" value="Shoulder Season" v-model="form.seasons">
                                     <span>Shoulder Season</span>
                                 </label>
                             </div>
@@ -434,7 +435,7 @@
                         <div class="ftrppup-checkbxhd">10. Availability Tags</div>
                         <div class="ftrppup-checkbx-rw">
                             <div class="ftrppup-checkbx-col checkbx-col6" v-for="tag in tags" :key="tag.id">
-                                <label class="ftrppup-chkbx-lbl" >
+                                <label class="ftrppup-chkbx-lbl">
                                     <input type="radio" name="name" :value="tag.id" v-model="form.availabilityTagId">
                                     <span>{{ tag.name }}</span>
                                 </label>
@@ -459,12 +460,14 @@ import { router } from "@inertiajs/vue3";
 import Banner from '@/components/Frontend/Banner.vue';
 import Multiselect from '@vueform/multiselect'
 import Pagination from '@/components/customPaginate.vue'
-import { pickBy, debounce } from "lodash";
+import _ from "lodash";
+const { pickBy, debounce } = _;
 import SafariCard from '@/components/Frontend/SafariCard.vue';
 import DateRange from "@/components/DateRange.vue";
+import Meta from '../../components/Frontend/Meta.vue';
 
 
-const params = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
 const visible = ref(false);
 const countryModalRef = ref(null);
 // const openCountryModal = ref(false);
@@ -477,7 +480,8 @@ const props = defineProps({
     countryGuides: Array,
     collections: Object,
     wildlives: Object,
-    tags: Object
+    tags: Object,
+    meta: Object
 });
 
 const activeFilter = ref(params.get('collection_id') || 'all')

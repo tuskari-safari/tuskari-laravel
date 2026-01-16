@@ -1,4 +1,5 @@
 <template>
+    <Meta :cms="props.meta" />
     <!-- <Banner pageName="Country Guide" /> -->
     <div class="bnrsec inerbnrsec">
         <img :src="country?.banner_image_url ?? '/frontend_assets/images/nat-park-bnr.jpg'" alt="bannerimg" class="bnrimg">
@@ -339,11 +340,13 @@
 import { onMounted, computed } from 'vue'
 import { homeJs } from "@/custom.js";
 import SafariCard from '@/components/Frontend/SafariCard.vue';
+import Meta from '../../components/Frontend/Meta.vue';
 
 const props = defineProps({
     country: Object,
     nationalParks: Object,
-    featuredSafaris: Object
+    featuredSafaris: Object,
+    meta: Object
 });
 
 const parsedFaqs = computed(() => {

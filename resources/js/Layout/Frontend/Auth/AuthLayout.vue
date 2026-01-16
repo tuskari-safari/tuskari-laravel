@@ -1,6 +1,5 @@
 <template lang="">
 <!-- <loading v-model:active="isLoading" :can-cancel="true" :is-full-page="true" /> -->
-    <body>
         <div class="dashboard_frame" v-bind="$attrs">
                 <Nav/>
             <div class="dashboard_right_panel">
@@ -22,7 +21,6 @@
 
        <!--log out filter popup-->
         
-    </body>
         
 </template>
 <script setup>

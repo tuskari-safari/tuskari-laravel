@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Admin\{AccomodationController, BlogController, CategoryController, CmsController, FaqController, HomeController, IssueController, MasterController, SafariController, SettingController, TestimonialController, UserController, VendorController, BannerController, BookingController, CollectionController, ContactUsController, CountryGuideController, HelpSupportController, NationalParkReserveController, PageController, SafariOperatorController, WebsiteRatingController, WithdrawalRequestController, AvailableTagController, OperatorReviewController, RegionController};
+use App\Http\Controllers\Admin\{AccomodationController, BlogController, CategoryController, CmsController, FaqController, HomeController, IssueController, MasterController, SafariController, SettingController, TestimonialController, UserController, VendorController, BannerController, BookingController, CollectionController, ContactUsController, CountryGuideController, HelpSupportController, NationalParkReserveController, PageController, SafariOperatorController, WebsiteRatingController, WithdrawalRequestController, AvailableTagController, OperatorReviewController, RegionController, PageMetaController, UploadController};
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Common\CommonController;
 use App\Models\AvailableTag;
@@ -127,6 +127,9 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::resource('faq', FaqController::class);
     Route::post('change-faq-status', [FaqController::class, 'changeFaqStatus']);
 
+    /** page meta */
+    Route::resource('page-meta', PageMetaController::class);
+
     /** Contact us */
     Route::get('contact-us', [ContactUsController::class, 'index'])->name('contact-us');
     Route::get('view-contact-us/{contactus}', [ContactUsController::class, 'viewContact'])->name('viewContactUs');
@@ -223,4 +226,9 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     //Settings
     Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+
+    //Uploads
+    Route::get('uploads', [UploadController::class, 'index'])->name('uploads.index');
+    Route::any('create-upload', [UploadController::class, 'create'])->name('uploads.create');
+    Route::delete('delete-upload/{id}', [UploadController::class, 'destroy'])->name('uploads.destroy');
 });

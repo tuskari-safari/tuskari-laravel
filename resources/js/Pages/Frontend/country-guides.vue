@@ -1,4 +1,5 @@
 <template>
+    <Meta :cms="props.meta" />
     <Banner pageName="Country Guide" />
     <div class="safari-style-sec with-filter  cmn-gap">
         <div class="safari-style-outer">
@@ -45,11 +46,13 @@ import Pagination from '@/components/customPaginate.vue'
 import Banner from '@/components/Frontend/Banner.vue';
 import { homeJs } from "@/custom.js";
 import { onMounted } from 'vue';
+import Meta from '../../components/Frontend/Meta.vue';
+
 
 
 const props = defineProps({
     countries: Object,
-    
+    meta: Object
 });
 
 onMounted(() => {

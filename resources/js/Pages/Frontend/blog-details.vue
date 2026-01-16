@@ -1,4 +1,5 @@
 <template>
+    <Meta :cms="props.meta" />
     <Banner pageName="Blog Details" />
     <div class="blog-listing-sec blg-details-pg">
         <div class="container">
@@ -51,13 +52,14 @@ import FeatureBlog from '@/components/Frontend/FeatureBlog.vue';
 import Banner from '@/components/Frontend/Banner.vue';
 import { onMounted } from 'vue'
 import { homeJs } from "@/custom.js";
-
+import Meta from '../../components/Frontend/Meta.vue';
 
 
 const props = defineProps({
     blog: Object,
     blogCategories: Array,
     featureBlogs: Array,
+    meta: Object
 });
 onMounted(() => {
     homeJs();

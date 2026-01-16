@@ -238,28 +238,24 @@ class LoginController extends Controller
         return Inertia::render('Frontend/safari-operator-register-one', ['countries' => $countries, 'countryCodes' => $countryCodes]);
     }
 
-
     public function safariOperatorRegisterTwo(Request $request)
     {
         if ($request->isMethod('POST')) {
-            $validatedData = $request->validate(
-                [
-                    'main_destination'     => 'required|array',
-                    'main_destination.*'   => 'string',
-                    'business_type'        => 'required',
-                    'is_operate_directly'  => 'required',
-                    'website_link'         => 'nullable|url',
-                    'instagram_link'       => 'nullable|url',
-                    'about_operation'      => 'nullable|string|max:1000',
-                    'password'             => ['required', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
-                    'confirm_password' => 'required|string|min:8|same:password',
-                    'terms'                => 'accepted',
-                ],
-                [
-                    'business_type.required' => 'How Many Employees Do You Currently Have?',
-                    'is_operate_directly.required' => 'How Many Years Have You Been Operating?'
-                ]
-            );
+            $validatedData = $request->validate([
+                'main_destination'     => 'required|array',
+                'main_destination.*'   => 'string',
+                'business_type'        => 'required',
+                'is_operate_directly'  => 'required',
+                'website_link'         => 'nullable|url',
+                'instagram_link'       => 'nullable|url',
+                'about_operation'      => 'nullable|string|max:1000',
+                'password'             => ['required', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
+                'confirm_password' => 'required|string|min:8|same:password',
+                'terms'                => 'accepted',
+            ], [
+                'business_type.required' => 'How Many Employees Do You Currently Have?',
+                'is_operate_directly.required' => 'How Many Years Have You Been Operating?'
+            ]);
 
             try {
                 $operator = new User();
