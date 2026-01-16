@@ -17,5 +17,8 @@ class DatabaseSeeder extends Seeder
         $this->call(CmsPageSeeder::class);
         $this->call(CountrySeeder::class);
         $this->call(PageSeeder::class);
+
+        // Safari platform data
+        $this->call(SafariDataSeeder::class);
     }
 }
