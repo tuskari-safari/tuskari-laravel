@@ -18,8 +18,15 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            "@": "/resources/js", 
+            "@": "/resources/js",
             "@public": path.resolve(__dirname, "public")
         }
-    }
+    },
+    // Docker/Sail compatibility
+    server: {
+        host: '0.0.0.0',
+        hmr: {
+            host: 'localhost',
+        },
+    },
 });
