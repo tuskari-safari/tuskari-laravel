@@ -1,4 +1,5 @@
 <template>
+    <Meta :cms="props.meta" />
     <Banner pageName="Blog Listing" />
     <div class="blog-listing-sec">
         <div class="container">
@@ -73,6 +74,7 @@ import BlogCategories from '@/components/Frontend/BlogCategory.vue';
 import FeatureBlog from '@/components/Frontend/FeatureBlog.vue';
 import Banner from '@/components/Frontend/Banner.vue';
 import { usePage } from '@inertiajs/vue3'
+import Meta from '../../components/Frontend/Meta.vue';
 
 const page = usePage();
 const params = () => new URLSearchParams(window.location.search);
@@ -82,6 +84,7 @@ const props = defineProps({
     blogs: Object,
     blogCategories: Array,
     featureBlogs: Array,
+    meta: Object
 });
 
 // Determine pagination route and parameters based on current URL

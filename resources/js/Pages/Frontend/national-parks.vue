@@ -1,4 +1,5 @@
 <template>
+    <Meta :cms="props.meta" />
     <Banner :pageName="pageName" />
     <div class="safari-style-sec with-filter cmn-gap">
         <div class="safari-style-filer">
@@ -78,16 +79,19 @@ import Banner from '@/components/Frontend/Banner.vue';
 import { computed, onMounted, ref, watch } from 'vue'
 import { homeJs } from "@/custom.js";
 import { router } from '@inertiajs/vue3';
-import {  debounce } from "lodash";
+import _ from "lodash";
+import Meta from '../../components/Frontend/Meta.vue';
+const { debounce } = _;
 
-const params = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
 const selectedCities = ref({});
 const filteredCountries = ref([]);
 const sortParam = ref('ALL');
 
 const props = defineProps({
     parksReserves: Object,
-    regionData: Array
+    regionData: Array,
+    meta: Object
 });
 const treeData = ref(props.regionData);
 

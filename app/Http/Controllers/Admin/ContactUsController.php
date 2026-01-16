@@ -11,7 +11,6 @@ use Inertia\Inertia;
 
 class ContactUsController extends Controller
 {
-
     public function index(Request $request)
     {
         try {

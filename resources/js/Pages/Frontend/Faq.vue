@@ -1,6 +1,6 @@
 <template>
+    <Meta :cms="props.meta" />
     <Banner pageName="faq" />
-
     <div class="faq-section-cont">
         <div class="container">
             <div class="h2-title">Frequently Asked Questions</div>
@@ -47,11 +47,13 @@
 import Banner from '@/components/Frontend/Banner.vue';
 import { onMounted } from 'vue'
 import { homeJs } from "@/custom.js";
+import Meta from '../../components/Frontend/Meta.vue';
 
 const props = defineProps({
     contactInfo: Object,
     faqPart1: Object,
-    faqPart2: Object
+    faqPart2: Object,
+    meta: Object
 });
 
 onMounted(() => {

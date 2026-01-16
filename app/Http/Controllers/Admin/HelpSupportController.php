@@ -39,15 +39,12 @@ class HelpSupportController extends Controller
     public function create(Request $request)
     {
         if ($request->isMethod('post')) {
-            // dd($request->all());
-            $credentials = $request->validate(
-                [
-                    'tag' => 'required',
-                    'question' => 'required|max:500',
-                    'answer' => 'required|max:1000',
-                    'status' => 'required',
-                ]
-            );
+            $credentials = $request->validate([
+                'tag' => 'required',
+                'question' => 'required|max:500',
+                'answer' => 'required|max:1000',
+                'status' => 'required',
+            ]);
             try {
                 $support = new HelpAndSupport();
                 $support->fill($credentials);
@@ -62,10 +59,11 @@ class HelpSupportController extends Controller
         return Inertia::render('Admin/help_support/CreateEdit');
     }
 
-    public function edit(Request $request, $id){
+    public function edit(Request $request, $id)
+    {
         $support = HelpAndSupport::find($id);
         if ($request->isMethod('post')) {
-             $credentials = $request->validate([
+            $credentials = $request->validate([
                 'tag' => 'required',
                 'question' => 'required|max:500',
                 'answer' => 'required|max:1000',
@@ -84,8 +82,9 @@ class HelpSupportController extends Controller
         return Inertia::render('Admin/help_support/CreateEdit', compact('support'));
     }
 
-    public function destroy($id){
-          try {
+    public function destroy($id)
+    {
+        try {
             HelpAndSupport::where('id', $id)->delete();
             session()->flash('success', 'Help & Support deleted successfully');
             return back();
@@ -95,7 +94,7 @@ class HelpSupportController extends Controller
         }
     }
 
-       public function changeStatus(Request $request)
+    public function changeStatus(Request $request)
     {
         try {
             $support = HelpAndSupport::find($request->id);

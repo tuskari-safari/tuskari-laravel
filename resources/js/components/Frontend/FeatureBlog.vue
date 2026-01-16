@@ -26,6 +26,7 @@
 
 <script setup>
 import moment from 'moment'
+import { route } from 'ziggy-js'
 const props = defineProps({
     featureBlogs: Array,
 })

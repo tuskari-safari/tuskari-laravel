@@ -1,6 +1,6 @@
 <template>
+    <Meta :cms="props.meta" />
     <Banner pageName="how-it-works" />
-
    <div class="default-pg cmn-gap">
         <div class="container">
         <div class="dfult-content" v-html="cms?.text_content" v-if="cms?.text_content"></div>
@@ -13,9 +13,11 @@
 import Banner from '@/components/Frontend/Banner.vue';
 import { onMounted } from 'vue'
 import { homeJs } from "@/custom.js";
+import Meta from '../../components/Frontend/Meta.vue';
 
 const props = defineProps({
-    cms: Object
+    cms: Object,
+    meta: Object
 });
 
 onMounted(() => {

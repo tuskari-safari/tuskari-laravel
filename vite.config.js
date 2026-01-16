@@ -13,6 +13,7 @@ export default defineConfig({
         }),
         laravel({
             input: ["resources/css/app.css", "resources/js/app.js"],
+            ssr: "resources/js/ssr.js",
             refresh: true,
         }),
     ],
@@ -21,5 +22,15 @@ export default defineConfig({
             "@": "/resources/js", 
             "@public": path.resolve(__dirname, "public")
         }
+    },
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: undefined, // Prevent chunk splitting for faster loading
+            }
+        }
+    },
+    ssr: {
+        noExternal: ['@inertiajs/vue3', 'ziggy-js']
     }
 });

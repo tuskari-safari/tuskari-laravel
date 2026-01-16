@@ -68,14 +68,15 @@ import { homeJs } from "@/custom.js";
 import { onMounted, watch } from 'vue';
 import Multiselect from '@vueform/multiselect'
 import { router, useForm } from '@inertiajs/vue3';
-import { pickBy } from "lodash";
+import _ from "lodash";
+const { pickBy } = _;
 
 const props = defineProps({
     destinations: Object,
     regions: Object,
 });
 
-const urlParams = new URLSearchParams(window.location.search);
+const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
 const form = useForm({
   regionIds: urlParams.getAll('regionIds') || [],
   type: urlParams.get('type') || ''

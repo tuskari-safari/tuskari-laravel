@@ -20,7 +20,7 @@ class ListingController extends Controller
                 ->select('adult_price')
                 ->whereColumn('seasonal_pricings.safari_id', 'safaris.id')
                 ->where('seasonal_pricings.season', 'LOW')
-                ->orderBy('seasonal_pricings.id', 'asc') // or date if you want first chronologically
+                ->orderBy('seasonal_pricings.id', 'asc')
                 ->limit(1)])
             ->withAvg('safariReviews', 'rating')
             ->when($request->status === 'draft', function ($query) {
@@ -49,7 +49,6 @@ class ListingController extends Controller
 
             $request->merge(['dateRange' => $dateRange]);
 
-            // Get form step for section-wise validation
             $formStep = $request->input('formStep');
 
             if ($formStep > 0) {
@@ -63,7 +62,6 @@ class ListingController extends Controller
                 }
             }
 
-            // Full form validation for final submission
             $request->validate([
                 /** String inputs */
                 'title' => 'required|string|max:80',
@@ -391,21 +389,6 @@ class ListingController extends Controller
                     }
                 }
 
-                /** Save wild life highlight */
-                // if ($request->animals) {
-                //     foreach ($request->animals as $index => $item) {
-                //         if (empty($item['animal_id']) && empty($item['probability']) && empty($item['description'])) {
-                //             continue;
-                //         }
-                //         SafariWildlifeSight::create([
-                //             'safari_id'   => $safari->id,
-                //             'animal_id'   => $item['animal_id'] ?? null,
-                //             'probability' => $item['probability'] ?? null,
-                //             'note'        => $item['description'] ?? null,
-                //         ]);
-                //     }
-                // }
-
                 /** Save things To Knows */
                 if ($request->thingsToKnows) {
                     foreach ($request->thingsToKnows as $index => $item) {
@@ -569,16 +552,16 @@ class ListingController extends Controller
                 case 3: // Safari Itinerary
                     if ($request->days) {
                         $existingJourneys = $safari->journeys()->with('journey_images')->get();
+                        $processedJourneyIds = [];
+                        
                         foreach ($request->days as $index => $day) {
                             $safariJourney = isset($existingJourneys[$index])
                                 ? $existingJourneys[$index]
                                 : new SafariJourney();
 
-
                             $highlights = [];
                             if (isset($day['animals'])) {
                                 foreach ($day['animals'] as $animal) {
-                                    $uniqueExperience = json_decode($safariJourney->wildlife_highlights, true) ?? [];
                                     if (empty($animal['animal_id']) && empty($animal['description'])) {
                                         continue;
                                     }
@@ -599,9 +582,10 @@ class ListingController extends Controller
                             $safariJourney->accommodation = $day['accommodation'] ?? '';
                             $safariJourney->wildlife_highlights = !empty($highlights) ? json_encode($highlights) : null;
                             $safariJourney->save();
+                            
+                            $processedJourneyIds[] = $safariJourney->id;
 
                             $existingImages = $safariJourney->journey_images;
-                            $existingImagePaths = $existingImages->pluck('image')->toArray();
                             $submittedImages = $day['image'] ?? [];
                             $submittedPaths = [];
 
@@ -637,6 +621,19 @@ class ListingController extends Controller
                                     $img->delete();
                                 }
                             }
+                        }
+                        
+                        // Delete journeys that were removed
+                        $journeysToDelete = $existingJourneys->whereNotIn('id', $processedJourneyIds);
+                        foreach ($journeysToDelete as $journey) {
+                            // Delete associated images first
+                            foreach ($journey->journey_images as $img) {
+                                if (file_exists($img->image)) {
+                                    @unlink($img->image);
+                                }
+                                $img->delete();
+                            }
+                            $journey->delete();
                         }
                     }
                     break;
@@ -870,14 +867,11 @@ class ListingController extends Controller
                     }
                     break;
             }
-            Log::debug("Saving form step: " . $formStep);
             // Update step saved status
             $stepStatus = $safari->step_saved_status ?? [];
             $stepStatus[$formStep] = true;
             $safari->step_saved_status = $stepStatus;
             $safari->save();
-            Log::debug("Saving form step after step save status: " . $formStep);
-
 
             DB::commit();
 
@@ -1294,7 +1288,6 @@ class ListingController extends Controller
                     'per_date_group_limit' => $request->perDateGroupLimit,
                     'is_draft' => 0,
                     'environment' => $request->environment ? json_encode($request->environment) : NULL,
-
                 ]);
 
                 if ($request->availabilityTag) {
@@ -1431,16 +1424,16 @@ class ListingController extends Controller
                 /** Save day by day */
                 if ($request->days) {
                     $existingJourneys = $safari->journeys()->with('journey_images')->get();
+                    $processedJourneyIds = [];
+                    
                     foreach ($request->days as $index => $day) {
                         $safariJourney = isset($existingJourneys[$index])
                             ? $existingJourneys[$index]
                             : new SafariJourney();
 
-
                         $highlights = [];
                         if (isset($day['animals'])) {
                             foreach ($day['animals'] as $animal) {
-                                $uniqueExperience = json_decode($safariJourney->wildlife_highlights, true) ?? [];
                                 if (empty($animal['animal_id']) && empty($animal['description'])) {
                                     continue;
                                 }
@@ -1461,9 +1454,10 @@ class ListingController extends Controller
                         $safariJourney->accommodation = $day['accommodation'] ?? '';
                         $safariJourney->wildlife_highlights = !empty($highlights) ? json_encode($highlights) : null;
                         $safariJourney->save();
+                        
+                        $processedJourneyIds[] = $safariJourney->id;
 
                         $existingImages = $safariJourney->journey_images;
-                        $existingImagePaths = $existingImages->pluck('image')->toArray();
                         $submittedImages = $day['image'] ?? [];
                         $submittedPaths = [];
 
@@ -1499,6 +1493,19 @@ class ListingController extends Controller
                                 $img->delete();
                             }
                         }
+                    }
+                    
+                    // Delete journeys that were removed
+                    $journeysToDelete = $existingJourneys->whereNotIn('id', $processedJourneyIds);
+                    foreach ($journeysToDelete as $journey) {
+                        // Delete associated images first
+                        foreach ($journey->journey_images as $img) {
+                            if (file_exists($img->image)) {
+                                @unlink($img->image);
+                            }
+                            $img->delete();
+                        }
+                        $journey->delete();
                     }
                 }
 
@@ -1678,14 +1685,6 @@ class ListingController extends Controller
             ];
         });
 
-        // $safari->group_pricing = $safari->group_pricing->map(function ($item) {
-        //     return [
-        //         'min' => $item->min,
-        //         'max' => $item->max,
-        //         'pp' => $item->pp,
-        //     ];
-        // });
-
         $safari->discount = $safari->group_pricing->map(function ($item) {
             return [
                 'person_type' => $item->person_type,
@@ -1707,6 +1706,10 @@ class ListingController extends Controller
                 'description' => $item->description,
             ];
         });
+        
+        // Add national parks data
+        $safari->national_parks = $safari->safari_parks->pluck('national_park_reserve_id')->toArray();
+        
         $safariAvailableTags = AvailableTag::where('show_in_frontend', 1)->get(['id', 'name'])->map(function ($item) {
             return [
                 'value' => $item->id,
@@ -1774,7 +1777,7 @@ class ListingController extends Controller
                 ->select('adult_price')
                 ->whereColumn('seasonal_pricings.safari_id', 'safaris.id')
                 ->where('seasonal_pricings.season', 'LOW')
-                ->orderBy('seasonal_pricings.id', 'asc') // or date if you want first chronologically
+                ->orderBy('seasonal_pricings.id', 'asc')
                 ->limit(1)])
             ->withAvg('safariReviews', 'rating')
             ->where('status', 1)
@@ -1795,7 +1798,6 @@ class ListingController extends Controller
                 $journey->wildlife_highlights = $highlights;
             }
         }
-
 
         foreach ($safari->wild_lives as $wildlife) {
             $animal = WildLife::find($wildlife->animal_id);
@@ -1851,7 +1853,9 @@ class ListingController extends Controller
                     'discount',
                     'gallery',
                     'wild_lives',
-                    'dateRange'
+                    'dateRange',
+                    'safari_parks',
+                    'seasonal_pricings'
                 )
                 ->first();
 
@@ -1859,8 +1863,12 @@ class ListingController extends Controller
             $newSafari->title = $originalSafari->title . ' (Copy)';
             $newSafari->created_at = now();
             $newSafari->updated_at = now();
-            $final_image_url = ImageHelper::customSaveDuplicateImage($originalSafari->thumbnail, 'safari_thumbnail', $newSafari->id);
-            $newSafari->thumbnail = $final_image_url;
+            
+            // Handle thumbnail duplication with null check
+            if ($originalSafari->thumbnail) {
+                $final_image_url = ImageHelper::customSaveDuplicateImage($originalSafari->thumbnail, 'safari_thumbnail', $newSafari->id);
+                $newSafari->thumbnail = $final_image_url;
+            }
             $newSafari->save();
 
             // Duplicate safari dates
@@ -1880,14 +1888,45 @@ class ListingController extends Controller
                 ]);
             }
 
+            // Duplicate tags
+            if ($originalSafari->tags && $originalSafari->tags->isNotEmpty()) {
+                $tagIds = $originalSafari->tags->pluck('id')->toArray();
+                $newSafari->tags()->attach($tagIds);
+            }
+
+            // Duplicate national parks
+            foreach ($originalSafari->safari_parks as $park) {
+                $newSafari->safari_parks()->create([
+                    'national_park_reserve_id' => $park->national_park_reserve_id
+                ]);
+            }
+
+            // Duplicate seasonal pricing
+            foreach ($originalSafari->seasonal_pricings as $pricing) {
+                $newSafari->seasonal_pricings()->create([
+                    'season' => $pricing->season,
+                    'available_start_date' => $pricing->available_start_date,
+                    'available_end_date' => $pricing->available_end_date,
+                    'blocked_start_date' => $pricing->blocked_start_date,
+                    'blocked_end_date' => $pricing->blocked_end_date,
+                    'adult_price' => $pricing->adult_price,
+                    'child_price' => $pricing->child_price
+                ]);
+            }
+
             //Duplicate Activities
             $activityIds = $originalSafari->activity->pluck('id')->toArray();
             $newSafari->activity()->attach($activityIds);
 
-            //duplicate group pricing
+            //duplicate group pricing (Tiered Pricing/Discount)
             if ($originalSafari->group_pricing && $originalSafari->group_pricing->isNotEmpty()) {
                 foreach ($originalSafari->group_pricing as $pricing) {
-                    $newSafari->group_pricing()->create($pricing->only(['min', 'max', 'pp']));
+                    $newSafari->group_pricing()->create([
+                        'person_type' => $pricing->person_type,
+                        'count' => $pricing->count,
+                        'season' => $pricing->season,
+                        'net_price' => $pricing->net_price
+                    ]);
                 }
             }
 
@@ -1917,6 +1956,7 @@ class ListingController extends Controller
                         'heading' => $journey->heading,
                         'subtext' => $journey->subtext,
                         'accommodation' => $journey->accommodation,
+                        'no_accommodation_included' => $journey->no_accommodation_included,
                         'meal' => $journey->meal,
                         'wildlife_location' => $journey->wildlife_location,
                         'wildlife_highlights' => $journey->wildlife_highlights,
@@ -1925,10 +1965,12 @@ class ListingController extends Controller
 
                     foreach ($journey->journey_images as $img) {
                         $final_image_url = ImageHelper::customSaveDuplicateImage($img->image, 'safari_journey_images', $newJourney->id);
-                        $safariImage = new SafariJourneyImages();
-                        $safariImage->safari_journey_id = $newJourney->id;
-                        $safariImage->image = $final_image_url;
-                        $safariImage->save();
+                        if ($final_image_url) {
+                            $safariImage = new SafariJourneyImages();
+                            $safariImage->safari_journey_id = $newJourney->id;
+                            $safariImage->image = $final_image_url;
+                            $safariImage->save();
+                        }
                     }
                 }
             }
@@ -1936,19 +1978,21 @@ class ListingController extends Controller
             if ($originalSafari->gallery && $originalSafari->gallery->isNotEmpty()) {
                 foreach ($originalSafari->gallery as $img) {
                     $final_image_url = ImageHelper::customSaveDuplicateImage($img->files, 'safari_gallery_images', $newSafari->id);
-                    $safariImage = new SafariGallery();
-                    $safariImage->safari_id = $newSafari->id;
-                    $safariImage->files = $final_image_url;
-                    $safariImage->type = 'image';
-                    $safariImage->save();
+                    if ($final_image_url) {
+                        $safariImage = new SafariGallery();
+                        $safariImage->safari_id = $newSafari->id;
+                        $safariImage->files = $final_image_url;
+                        $safariImage->type = 'image';
+                        $safariImage->save();
+                    }
                 }
             }
             DB::commit();
             return redirect()->route('frontend.safari-manage-listing')->with('success', 'Safari duplicated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Safari duplication failed: " . $e->getMessage());
-            return response()->json(['success' => false, 'error' => 'Failed to duplicate safari.'], 500);
+            Log::error("File: " . $e->getFile() . " Line: " . $e->getLine() . " - " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            abort(500);
         }
     }
 }

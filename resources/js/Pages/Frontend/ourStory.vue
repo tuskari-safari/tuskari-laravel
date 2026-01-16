@@ -1,4 +1,5 @@
 <template>
+    <Meta :cms="props.meta" />
     <Banner pageName="Story" />
     <div class="default-pg cmn-gap">
         <div class="container">
@@ -12,9 +13,11 @@
 import Banner from '@/components/Frontend/Banner.vue';
 import { onMounted } from 'vue'
 import { homeJs } from "@/custom.js";
+import Meta from '../../components/Frontend/Meta.vue';
 
 const props = defineProps({
-    cms: Object
+    cms: Object,
+    meta: Object
 });
 
 onMounted(() => {

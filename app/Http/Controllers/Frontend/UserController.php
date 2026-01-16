@@ -210,14 +210,12 @@ class UserController extends Controller
                                     $minResponseTime = $diffSeconds;
                                 }
                             }
-                            // After pairing, reset
                             $chatRooms[$roomId]['last_user_message_time'] = null;
                         }
                     }
                 }
 
                 if (!is_null($minResponseTime)) {
-                    // Just assign seconds directly
                     $safari->fastest_reply_time = $minResponseTime; // total seconds (int)
                 }
 
@@ -410,7 +408,6 @@ class UserController extends Controller
 
     public function tripReview(Request $request)
     {
-        // dd($request->all());
         $request->validate([
             'safari_id' => 'required|exists:safaris,id',
             'rating' => 'required|integer|min:1|max:5',

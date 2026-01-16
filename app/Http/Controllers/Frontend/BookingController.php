@@ -16,7 +16,6 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Notifications\SendNotification;
-use Hamcrest\Core\Set;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -78,7 +77,6 @@ class BookingController extends Controller
         try {
             $safari = Safari::with('group_pricing')->find($request->safari_id);
 
-
             if (!$safari) {
                 return response()->json([
                     'price' => (float) $request->adultPrice,
@@ -90,7 +88,6 @@ class BookingController extends Controller
             $numberOfAdults = (int) $request->noOfAdults;
             $numberOfChildren = (int) $request->noOfChildren;
             $season = strtolower($request->season);
-
 
             $adultGroup = $safari->group_pricing()
                 ->where('person_type', 'ADULT')
@@ -112,7 +109,6 @@ class BookingController extends Controller
                 ->orderByDesc('count')
                 ->first();
 
-            // Apply group prices if applicable
             $finalAdultPrice = $adultGroup ? (float) $adultGroup->net_price : 0;
             $finalChildPrice = $childGroup ? (float) $childGroup->net_price : 0;
 
@@ -278,7 +274,6 @@ class BookingController extends Controller
                 $booking->save();
 
                 /** Add funds to wallet as booking is confirmed */
-
                 if ($booking->is_full_paid) {
                     $wallet = Wallet::firstOrCreate(['operator_id' => $booking->operator_id], [
                         'available_amount' => 0,
@@ -319,7 +314,6 @@ class BookingController extends Controller
 
             Mail::to($operator->email)->queue(new SafariBookingConfirmation($data));
             Mail::to(Auth::user()->email)->queue(new TravelerBookingConfirmation($data));
-
 
             session()->forget('safari_booking');
             return response()->json(['message' => 'Payment status updated']);
@@ -441,10 +435,9 @@ class BookingController extends Controller
                 'operator',
             ])->find($request->safariBookingId);
 
-
-
         return response()->json($booking);
     }
+
     public function manualPayment(Request $request)
     {
         $request->validate([
@@ -517,15 +510,12 @@ class BookingController extends Controller
                 'state' => 'paid_in_full',
             ]);
 
-            $wallet = Wallet::firstOrCreate(
-                ['operator_id' => $booking->operator_id],
-                [
-                    'available_amount' => 0,
-                    'pending_amount' => 0,
-                    'total_earned' => 0,
-                    'total_withdrawn' => 0,
-                ]
-            );
+            $wallet = Wallet::firstOrCreate(['operator_id' => $booking->operator_id], [
+                'available_amount' => 0,
+                'pending_amount' => 0,
+                'total_earned' => 0,
+                'total_withdrawn' => 0,
+            ]);
 
             if ($booking->is_full_paid) {
                 $wallet->addFunds($booking->pay_to_operator, $booking->id, 'Safari booking payment');
@@ -569,7 +559,6 @@ class BookingController extends Controller
             return response()->json(['error' => 'Failed to create booking or payment'], 500);
         }
     }
-
 
     public function cancelBooking(Request $request)
     {

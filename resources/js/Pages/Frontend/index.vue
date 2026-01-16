@@ -1,4 +1,5 @@
 <template>
+    <Meta :cms="props.meta" />
     <div class="bnrsec homebnrsec new_modify_bnnr ">
         <img :src="props.homeBanner?.full_image ?? 'frontend_assets/images/bnrimg.jpg'" alt="bannerimg" class="bnrimg">
         <div class="container">
@@ -493,16 +494,19 @@
 <script setup>
 import { onMounted, reactive, ref, computed, onUnmounted } from 'vue';
 import { homeJs } from "@/custom.js";
-import { router } from "@inertiajs/vue3";
-import { pickBy } from "lodash";
+import { router, Head } from "@inertiajs/vue3";
+import _ from "lodash";
+const { pickBy } = _;
 import SafariCard from '@/components/Frontend/SafariCard.vue';
 import DateRange from "@/components/DateRange.vue";
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
+import Meta from '../../components/Frontend/Meta.vue';
+
 
 const visible = ref(false);
 const countryModalRef = ref(null);
-const screenWidth = ref(window.innerWidth);
+const screenWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1920);
 
 const form = reactive({
     location: '',
@@ -545,7 +549,8 @@ const props = defineProps({
     featuredSafaris: Array,
     destinations: Array,
     countryGuides: Array,
-    regions: Array
+    regions: Array,
+    meta: Object
 });
 
 onMounted(() => {

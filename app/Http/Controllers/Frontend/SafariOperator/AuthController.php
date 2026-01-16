@@ -22,15 +22,12 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class AuthController extends Controller
 {
     public function operatorDashboard()
     {
-        $today = Carbon::now()->toDateString();
         $mySafaris = Safari::with('create_safari_type.type', 'country')
             ->where('user_id', Auth::id())
             ->addSelect(['total_price' => DB::table('seasonal_pricings')
@@ -98,20 +95,16 @@ class AuthController extends Controller
                     case 'completed':
                         $query->where('status', 'COMPLETED');
                         break;
-
                     case 'ongoing':
                         $query->whereDate('check_in_date', $today)
                             ->where('status', 'ACTIVE');
                         break;
-
                     case 'upcoming':
                         $query->whereDate('check_in_date', '>', $today)
                             ->whereIn('status', ['ACTIVE', 'PENDING']);
                         break;
-
                     case 'all':
                         break;
-
                     default:
                         $query->where('status', $request->status);
                         break;
@@ -143,7 +136,6 @@ class AuthController extends Controller
         session()->flash('success', 'Booking status successfully changed.');
         return redirect()->back();
     }
-
 
     public function operatorEarnings(Request $request)
     {

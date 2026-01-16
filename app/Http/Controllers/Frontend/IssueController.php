@@ -50,7 +50,6 @@ class IssueController extends Controller
         ]);
 
         try {
-
             $rating = $ratingId ? WebsiteRating::find($ratingId) : new WebsiteRating();
             $rating->user_id = Auth::id();
             $rating->rating = $request->rating;

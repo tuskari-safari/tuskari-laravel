@@ -693,6 +693,7 @@
 import { onMounted, ref, computed, watch } from 'vue'
 import { homeJs } from "@/custom.js";
 import { router } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
 import SafariCard from '@/components/Frontend/SafariCard.vue';
 import MapBoxView from '@/components/Frontend/MapBoxView.vue';
 import ListHelper from "@/helpers/ListHelper";
@@ -712,7 +713,7 @@ const props = defineProps({
     canBook: Boolean,
     setting: Object
 });
-const storeData = localStorage.getItem('safariBookingData');
+const storeData = typeof window !== 'undefined' ? localStorage.getItem('safariBookingData') : null;
 const parsed = storeData ? JSON.parse(storeData) : {};
 const checkInDate = ref(parsed?.check_in_date ?? null);
 const checkOutDate = ref(parsed?.check_out_date ?? null);
@@ -741,7 +742,7 @@ onMounted( async() => {
 });
 
 const share = ref({
-    safariLink: route('frontend.safari-details', { id: props?.safari?.id }),
+    safariLink: typeof window !== 'undefined' ? route('frontend.safari-details', { id: props?.safari?.id }) : '',
     safariTitle: props?.safari?.title,
 });
 
@@ -756,16 +757,20 @@ const scrollToSection = (id) => {
     }
 }
 const chatWithOperator = (id = 0, isGroup = '', chatMembers, chatName) => {
-    localStorage.removeItem('chatDetailsData');
-    const chatDetails = {
-        chatRoom: id,
-        chatRoomUser: chatMembers[0].user,
-        chatName: chatName,
-        autoGenerateMessage: props?.safari?.autoGenerateMessage
-    };
-    localStorage.setItem('chatDetailsData', JSON.stringify(chatDetails));
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem('chatDetailsData');
+        const chatDetails = {
+            chatRoom: id,
+            chatRoomUser: chatMembers[0].user,
+            chatName: chatName,
+            autoGenerateMessage: props?.safari?.autoGenerateMessage
+        };
+        localStorage.setItem('chatDetailsData', JSON.stringify(chatDetails));
+    }
 
-    router.get(route('frontend.messages'));
+    if (typeof window !== 'undefined') {
+        router.get(route('frontend.messages'));
+    }
 };
 
 const nextDayOfCheckIn = computed(() => {
@@ -882,7 +887,7 @@ const hasDiscountAdultPrice = ref(false);
 const hasDiscountChildPrice = ref(false);
 
 const checkPriceSpecialDiscount = () => {
-    if (!numberOfAdults.value || !seasonPrices.value?.adultPrice) {
+    if (!numberOfAdults.value || !seasonPrices.value?.adultPrice || typeof window === 'undefined') {
         return;
     }
     let data = {
@@ -951,7 +956,9 @@ const handleBookSafari = () => {
         number_of_adults: numberOfAdults.value,
         number_of_children: numberOfChildren.value
     }
-    localStorage.setItem('safariBookingData', JSON.stringify(bookingData));
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('safariBookingData', JSON.stringify(bookingData));
+    }
     router.post('/safari-booking', {
         safari_id: props.safari.id,
         check_in_date: checkInDate.value,

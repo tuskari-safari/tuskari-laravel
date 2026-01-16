@@ -7,13 +7,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Safari;
 use App\Models\SafariBooking;
+use App\Models\User;
 use App\Rules\MatchOldPassword;
 use App\Rules\NewOldPasswordNotSame;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class AuthController extends Controller
@@ -58,7 +58,7 @@ class AuthController extends Controller
 
     public function travellerProfile(Request $request)
     {
-        $profile = Auth::user();
+        $profile = User::where('id', Auth::id())->first();
         if ($request->isMethod('post')) {
             $request->validate([
                 'full_name' => 'required|string|max:50|regex:/^[\pL\s]+$/u',
@@ -94,7 +94,7 @@ class AuthController extends Controller
             'confirm_password' => ['required_with:new_password', 'same:new_password'],
         ]);
 
-        $user = Auth::user();
+        $user = User::find(Auth::id());
         $user->password = $request->new_password;
         $user->save();
         return redirect()->route('frontend.traveller-profile')->with('success', 'Password updated successfully');

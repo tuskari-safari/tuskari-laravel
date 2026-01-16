@@ -33,13 +33,14 @@ class ImageHelper
             $fileOrPath->storeAs($destinationPath, $fileName, 'public');
         } else {
             $originalPath = str_replace('storage/', '', $fileOrPath); 
-            if (!Storage::exists($originalPath)) {
-                throw new \Exception("File does not exist: {$fileOrPath}");
+            if (!Storage::disk('public')->exists($originalPath)) {
+                // Return null or a default image path instead of throwing exception
+                return null;
             }
             $extension = pathinfo($originalPath, PATHINFO_EXTENSION);
             $fileName = uniqid() . time() . rand(10, 1000000) . '_' . $duplicateSafariId . '.' . $extension;
             $newPath = $destinationPath . '/' . $fileName;
-            Storage::copy($originalPath, $newPath);
+            Storage::disk('public')->copy($originalPath, $newPath);
         }
 
         return 'storage/' . $destinationPath . '/' . $fileName;

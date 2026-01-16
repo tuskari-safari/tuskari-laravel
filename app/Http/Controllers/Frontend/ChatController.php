@@ -71,7 +71,7 @@ class ChatController extends Controller
         }
     }
 
-    public function reverb(Request $request)
+    public function reverb()
     {
         try {
             broadcast(new ChatMessageEvent("connected"))->toOthers();
@@ -81,7 +81,7 @@ class ChatController extends Controller
         }
     }
 
-    public function output(Request $request)
+    public function output()
     {
         try {
             return Inertia::render('Output');
@@ -154,7 +154,7 @@ class ChatController extends Controller
                     $chatRoom->delete();
                 });
             } else {
-                $chatdelete = ChatDeletion::updateOrInsert(
+                ChatDeletion::updateOrInsert(
                     ['chat_room_id' => $chatRoom->id, 'user_id' => Auth::id()],
                     ['deleted_at' => now(), 'updated_at' => now(), 'created_at' => now()]
                 );
@@ -213,7 +213,6 @@ class ChatController extends Controller
             $newuser = $request->isNewUser;
 
             if ($newuser) {
-
                 $new_chat_room = new ChatRoom;
                 $new_chat_room->group_id = $new_chat_room->id;
                 $new_chat_room->is_group = 0;

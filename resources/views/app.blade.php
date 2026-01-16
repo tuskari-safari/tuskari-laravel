@@ -7,8 +7,25 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#ffffff">
 
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('frontend_assets/favicon.ico') }}">
-    {{-- <title>{{ config('app.name', 'Laravel') }}</title> --}}
+    <!-- Fallback -->
+     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('frontend_assets/favicon.ico') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('frontend_assets/favicon.ico') }}" media="(prefers-color-scheme: dark)">
+    <!-- Theme-specific favicons -->
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('frontend_assets/favicon-wh.ico') }}" media="(prefers-color-scheme: light)">
+
+    <!-- Preload critical resources -->
+
+    
+    @if (request()->is('admin/*'))
+        <link rel="preload" href="{{ asset('admin_assets/custom.css') }}" as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+    @else
+        <link rel="preload" href="{{ asset('frontend_assets/style.css') }}" as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+    @endif
+    <noscript>
+        <link rel="stylesheet" href="{{ asset('admin_assets/custom.css') }}">
+    </noscript>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
         integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     <link href="{{ asset('admin_assets/vendors/custom/vendors/fontawesome5/css/all.min.css') }}" rel="stylesheet"
@@ -22,7 +39,38 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        /* Prevent FOUC - Hide body until styles are loaded */
+        body {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.1s ease-in-out;
+        }
 
+        /* Show body when styles are loaded */
+        body.loaded {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Critical CSS for immediate rendering */
+        .main-wrapr,
+        .main_wrppr_alt {
+            min-height: 100vh;
+        }
+
+        /* Loading state */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
     @routes
     @vite('resources/js/app.js')
@@ -31,6 +79,18 @@
 
 <body>
     @inertia
+
+    <script>
+        // Show body when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.classList.add('loaded');
+        });
+
+        // Fallback: Show body after a short delay
+        setTimeout(function() {
+            document.body.classList.add('loaded');
+        }, 100);
+    </script>
 </body>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

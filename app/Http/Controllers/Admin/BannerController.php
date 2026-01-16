@@ -75,7 +75,6 @@ class BannerController extends Controller
         return Inertia::render('Admin/banner/CreateEdit');
     }
 
-
     public function edit($banner_id)
     {
         try {
@@ -119,7 +118,6 @@ class BannerController extends Controller
         session()->flash('success', 'Banner updated successfully.');
         return redirect()->route('admin.banner_list');
     }
-
 
     public function deleteBanner($id)
     {

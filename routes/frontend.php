@@ -13,8 +13,6 @@ use App\Http\Controllers\Frontend\UserController;
 use App\Http\Controllers\Frontend\WalletController;
 use App\Models\CurrencyExchangeRate;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 Route::get('/', [HomeController::class, 'index'])->name('index');
 Route::get('safari-listings', [HomeController::class, 'safariListings'])->name('safari-listings');
@@ -141,6 +139,6 @@ Route::get('get-settings', [HomeController::class, 'getSettings'])->name('get-se
 
 Route::get('/exchange-rates', function () {
     $currencyExchangeRate = CurrencyExchangeRate::first();
-    return response()->json(json_decode($currencyExchangeRate->rates));
+    return response()->json(json_decode($currencyExchangeRate?->rates));
 });
 

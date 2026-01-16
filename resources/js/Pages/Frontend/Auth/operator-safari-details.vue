@@ -444,6 +444,9 @@ onMounted(() => {
     emit.on("deleteConfirm", function (arg1) {
         deleteConfirm(arg1);
     });
+    emit.on("duplicateConfirm", function (arg1) {
+        duplicateConfirm(arg1);
+    });
 
     location.value = {
         name: props?.safari?.location,
@@ -457,6 +460,7 @@ onMounted(() => {
 
 onUnmounted(() => {
     emit.off("deleteConfirm");
+    emit.off("duplicateConfirm");
 });
 
 const form = useForm({
@@ -464,9 +468,19 @@ const form = useForm({
 });
 
 const duplicateRecode = (id) => {
+    sw.confirm(
+        "duplicateConfirm",
+        id,
+        "Confirm duplication",
+        "All related safari data will be duplicated into a new record.",
+        "Duplicate safari"
+    );
+};
+
+
+const duplicateConfirm = (id) => {
     form.safari_id = id;
     form.post(route('frontend.duplicate-safari'));
-}
-
+};
 
 </script>

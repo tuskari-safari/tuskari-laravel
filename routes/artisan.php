@@ -15,13 +15,13 @@ Route::get('clear', function () {
 
 
 
+Route::get('laravel-log', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
 if (config('app.artisan') == 1) {
 
     Route::get('view-env', function () {
         return file_get_contents($_SERVER['DOCUMENT_ROOT'] . "/../.env", true);
     });
 
-    Route::get('laravel-log', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
 
     Route::get('migrate', function () {
         Artisan::call('migrate');
