@@ -81,6 +81,10 @@
                                 <div class="booking_summry_bdy form_box">
                                     <form @submit.prevent="handleClickConfirmCheckout">
                                         <div class="booking_dtl_wrap">
+                                            <div v-if="bookingData?.is_enquiry_booking" class="enquiry-booking-badge mb-2">
+                                                <span class="badge">Enquiry Booking</span>
+                                                <small>Price agreed with operator</small>
+                                            </div>
                                             <div class="bkwrap_head">
                                                 {{ safari?.title ?? 'NA' }} - {{ safari?.location ?? 'NA' }}
                                             </div>
@@ -163,7 +167,7 @@
                                                     <div class="usr-ttl-prc">{{ formatLocalPrice(bookingData?.total_child_price) }}</div>
                                                 </div>
                                             </div>
-                                            <span class="cmn-butn mt-2" style="padding: 4px 12px;" v-if="bookingData.hasDiscountAdultPrice || bookingData.hasDiscountChildPrice">Group Discount Applied</span>
+                                            <span class="cmn-butn mt-2" style="padding: 4px 12px;" v-if="!bookingData?.is_enquiry_booking && (bookingData.hasDiscountAdultPrice || bookingData.hasDiscountChildPrice)">Group Discount Applied</span>
 
                                         </div>
                                         <div class="payment_wrap_chkin">
@@ -671,5 +675,31 @@ const isDepositAllowed = computed(() => {
         right: 5px;
         font-size: 8px;
     }
+}
+
+.enquiry-booking-badge {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border: 1px solid #90caf9;
+    border-radius: 8px;
+    padding: 10px 14px;
+    text-align: center;
+}
+
+.enquiry-booking-badge .badge {
+    display: inline-block;
+    background: #1976d2;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.enquiry-booking-badge small {
+    display: block;
+    color: #1565c0;
+    font-size: 12px;
 }
 </style>

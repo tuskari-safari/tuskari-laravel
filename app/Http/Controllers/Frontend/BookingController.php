@@ -151,17 +151,23 @@ class BookingController extends Controller
             'operator_adult_price' => 'required|numeric|min:1',
             'operator_child_price' => 'nullable|numeric',
             'hasDiscountAdultPrice' => 'required|boolean',
-            'hasDiscountChildPrice' => 'required|boolean'
+            'hasDiscountChildPrice' => 'required|boolean',
+            'is_enquiry_booking' => 'nullable|boolean',
+            'enquiry_id' => 'nullable|exists:safari_bookings,id'
         ]);
         $safari = Safari::where('id', $validatedData['safari_id'])->first();
+        $isEnquiryBooking = $request->is_enquiry_booking ?? false;
+        $enquiryId = $request->enquiry_id ?? null;
 
-        /** Check if user already has an active booking */
-        $alreadyBooked = SafariBooking::where('traveler_id', Auth::id())
-            ->where('status', 'ACTIVE')
-            ->where('safari_id', $validatedData['safari_id'])
-            ->first();
-        if ($alreadyBooked) {
-            return response()->json(['error' => 'You already have an active booking for this safari.'], 422);
+        /** Check if user already has an active booking (skip for enquiry bookings) */
+        if (!$isEnquiryBooking) {
+            $alreadyBooked = SafariBooking::where('traveler_id', Auth::id())
+                ->where('status', 'ACTIVE')
+                ->where('safari_id', $validatedData['safari_id'])
+                ->first();
+            if ($alreadyBooked) {
+                return response()->json(['error' => 'You already have an active booking for this safari.'], 422);
+            }
         }
 
         DB::beginTransaction();
@@ -178,43 +184,72 @@ class BookingController extends Controller
                 'amount' => $request->payment_type === 'deposit' ? intval($validatedData['deposit_amount'] * 100) : intval($validatedData['total_payable'] * 100),
                 'currency' => 'USD',
                 'payment_method' => $request->card_id,
-                'description' => $safari->title . ' - ' . $request->duration . ' Booking'
+                'description' => $safari->title . ' - ' . $request->duration . ' Booking' . ($isEnquiryBooking ? ' (Enquiry)' : '')
             ];
 
             if (Auth::user()->stripe_customer_id) {
                 $paymentIntentData['customer'] = Auth::user()->stripe_customer_id;
             }
             $paymentIntent = PaymentIntent::create($paymentIntentData);
+
             /** Calculate additional cost */
-            $totalAdultPrice = $validatedData['operator_adult_price'] * $validatedData['number_of_adults'];
-            $totalChildPrice = $validatedData['operator_child_price'] * $validatedData['number_of_children'];
-            $additionalCost = (float) number_format($validatedData['total_adult_price'] - $totalAdultPrice, 2, '.', '');
-            $payToOperator = (float) number_format($totalAdultPrice + $totalChildPrice, 2, '.', '');
+            if ($isEnquiryBooking) {
+                $setting = Setting::first();
+                $platformFeePercentage = $setting->platform_fee ?? 13;
+                $platformFee = round(($validatedData['total_payable'] * $platformFeePercentage) / 100, 2);
+                $payToOperator = $validatedData['total_payable'] - $platformFee;
+                $additionalCost = 0;
+            } else {
+                $totalAdultPrice = $validatedData['operator_adult_price'] * $validatedData['number_of_adults'];
+                $totalChildPrice = $validatedData['operator_child_price'] * $validatedData['number_of_children'];
+                $additionalCost = (float) number_format($validatedData['total_adult_price'] - $totalAdultPrice, 2, '.', '');
+                $payToOperator = (float) number_format($totalAdultPrice + $totalChildPrice, 2, '.', '');
+            }
 
-            $booking = SafariBooking::create([
-                'traveler_id' => Auth::id(),
-                'operator_id' => Safari::find($validatedData['safari_id'])->user_id,
-                'safari_id' => $validatedData['safari_id'],
-                'adult_price' => $validatedData['total_adult_price'],
-                'children_price' => $validatedData['total_child_price'],
-                'check_in_date' => $validatedData['check_in_date'],
-                'check_out_date' => $validatedData['check_out_date'],
-                'no_of_adults' => $validatedData['number_of_adults'],
-                'no_of_children' => $validatedData['number_of_children'] ?? 0,
-                'duration' => $validatedData['duration'],
-                'payment_status' => 'pending',
-                'total_price' => $validatedData['total_payable'],
-                'additional_fee' => $additionalCost,
-                'pay_to_operator' => $payToOperator,
-                'deposit_amount' => $validatedData['deposit_amount'] ?? 0,
-                'next_deposit_amount' => $validatedData['next_deposit_amount'] ?? 0,
-                'next_deposit_date' => $validatedData['next_deposit_date'] ?? null,
-                'payment_type' => $request->payment_type === 'deposit' ? 'deposit_auto_payment' : 'pay_in_full',
-                'payment_method_id' => $validatedData['card_id'],
-                'is_full_paid' => $request->payment_type === 'deposit' ? 0 : 1,
-            ]);
+            /** For enquiry bookings, update existing booking; otherwise create new */
+            if ($isEnquiryBooking && $enquiryId) {
+                $booking = SafariBooking::findOrFail($enquiryId);
+                $booking->update([
+                    'adult_price' => $validatedData['total_adult_price'],
+                    'children_price' => $validatedData['total_child_price'],
+                    'payment_status' => 'pending',
+                    'total_price' => $validatedData['total_payable'],
+                    'additional_fee' => $additionalCost,
+                    'pay_to_operator' => $payToOperator,
+                    'deposit_amount' => $validatedData['deposit_amount'] ?? 0,
+                    'next_deposit_amount' => $validatedData['next_deposit_amount'] ?? 0,
+                    'next_deposit_date' => $validatedData['next_deposit_date'] ?? null,
+                    'payment_type' => $request->payment_type === 'deposit' ? 'deposit_auto_payment' : 'pay_in_full',
+                    'payment_method_id' => $validatedData['card_id'],
+                    'is_full_paid' => $request->payment_type === 'deposit' ? 0 : 1,
+                    'booking_id' => 'TSK-' . $booking->id,
+                ]);
+            } else {
+                $booking = SafariBooking::create([
+                    'traveler_id' => Auth::id(),
+                    'operator_id' => Safari::find($validatedData['safari_id'])->user_id,
+                    'safari_id' => $validatedData['safari_id'],
+                    'adult_price' => $validatedData['total_adult_price'],
+                    'children_price' => $validatedData['total_child_price'],
+                    'check_in_date' => $validatedData['check_in_date'],
+                    'check_out_date' => $validatedData['check_out_date'],
+                    'no_of_adults' => $validatedData['number_of_adults'],
+                    'no_of_children' => $validatedData['number_of_children'] ?? 0,
+                    'duration' => $validatedData['duration'],
+                    'payment_status' => 'pending',
+                    'total_price' => $validatedData['total_payable'],
+                    'additional_fee' => $additionalCost,
+                    'pay_to_operator' => $payToOperator,
+                    'deposit_amount' => $validatedData['deposit_amount'] ?? 0,
+                    'next_deposit_amount' => $validatedData['next_deposit_amount'] ?? 0,
+                    'next_deposit_date' => $validatedData['next_deposit_date'] ?? null,
+                    'payment_type' => $request->payment_type === 'deposit' ? 'deposit_auto_payment' : 'pay_in_full',
+                    'payment_method_id' => $validatedData['card_id'],
+                    'is_full_paid' => $request->payment_type === 'deposit' ? 0 : 1,
+                ]);
 
-            $booking->update(['booking_id' => 'TSK-' . $booking->id]);
+                $booking->update(['booking_id' => 'TSK-' . $booking->id]);
+            }
 
             // Save Payment
             Payment::create([
