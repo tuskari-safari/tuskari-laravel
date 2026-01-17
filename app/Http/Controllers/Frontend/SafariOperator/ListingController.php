@@ -509,6 +509,7 @@ class ListingController extends Controller
                     $safari->travel_season = implode(', ', $request->seasons ?? []);
                     $safari->day_duration = $request->day_duration;
                     $safari->night_duration = $request->night_duration;
+                    $safari->booking_mode = $request->booking_mode ?? 'booking';
                     $safari->save();
 
                     // Save thumbnail
