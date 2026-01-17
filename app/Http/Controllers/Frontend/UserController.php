@@ -91,6 +91,13 @@ class UserController extends Controller
                 $q->where('safari_type_id', $request->safari_type);
             });
         }
+        if ($request->filled('booking_type')) {
+            if ($request->booking_type === 'enquiries') {
+                $query->where('is_enquiry', true);
+            } elseif ($request->booking_type === 'bookings') {
+                $query->where('is_enquiry', false);
+            }
+        }
 
         $bookings = $query
             ->latest()

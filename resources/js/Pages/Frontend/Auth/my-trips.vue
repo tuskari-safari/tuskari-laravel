@@ -30,6 +30,15 @@
                                     class="multislect-dropdwn multislect-cmn-adj" :close-on-select="true"
                                     :searchable="true" :create-option="false" :options="safariTypes" />
                             </div>
+                            <div class="sortng_input_col">
+                                <Multiselect placeholder="Booking Type" v-model="form.booking_type"
+                                    class="multislect-dropdwn multislect-cmn-adj" :close-on-select="true"
+                                    :searchable="true" :create-option="false" :options="[
+                                        { value: '', label: 'All' },
+                                        { value: 'bookings', label: 'Confirmed Bookings' },
+                                        { value: 'enquiries', label: 'Enquiries' }
+                                    ]" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -69,9 +78,22 @@
                                 <td>{{ booking?.duration }}</td>
                                 <td>
                                     <div class="stus_cell_hlder">
-                                        <div class="stus_bttn_lke">{{
+                                        <div v-if="booking.is_enquiry" :class="'enquiry-status-badge enquiry-' + booking.enquiry_status">
+                                            {{ capitalizeFirst(booking.enquiry_status) }}
+                                        </div>
+                                        <div v-else class="stus_bttn_lke">{{
                                             booking?.status }}</div>
-                                        <a @click.prevent="handleClickBookingDetails(booking.id)"
+                                        <a v-if="booking.is_enquiry && booking.enquiry_status === 'pending'"
+                                            @click.prevent="goToChat(booking.chat_room_id)"
+                                            href="javascript:void(0)" title="View Chat">
+                                            <Icon icon="mdi:chat" width="20" />
+                                        </a>
+                                        <a v-else-if="booking.is_enquiry && booking.enquiry_status === 'quoted'"
+                                            @click.prevent="handleEnquiryAction(booking)"
+                                            href="javascript:void(0)" title="View Quote">
+                                            <Icon icon="mdi:currency-usd" width="20" />
+                                        </a>
+                                        <a v-else @click.prevent="handleClickBookingDetails(booking.id)"
                                             href="javascript:void(0)"><img
                                                 :src="'/frontend_assets/images/optn_icon.svg'" alt="Paid"></a>
                                     </div>
@@ -443,6 +465,7 @@ const form = reactive({
     day_duration: params().get("day_duration") || '',
     location: params().get("location") || '',
     safari_type: params().get("safari_type") || '',
+    booking_type: params().get("booking_type") || '',
 });
 
 const resetSearch = () => {
@@ -616,6 +639,21 @@ const isDepositDateValid = computed(() => {
     return depositDate >= today;
 });
 
+// Enquiry helpers
+const capitalizeFirst = (str) => {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+const goToChat = (chatRoomId) => {
+    router.visit(route('frontend.messages'));
+};
+
+const handleEnquiryAction = (booking) => {
+    // Navigate to chat where the enquiry context panel will show
+    router.visit(route('frontend.messages'));
+};
+
 </script>
 <style src="@vueform/multiselect/themes/default.css"></style>
 <style>
@@ -753,5 +791,47 @@ const isDepositDateValid = computed(() => {
 
 .p-progressspinner.custom-spinner {
     height: 46px !important;
+}
+
+/* Enquiry status badges */
+.enquiry-status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.enquiry-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.enquiry-quoted {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.enquiry-confirmed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.enquiry-declined {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.stus_cell_hlder a {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px;
+    color: #666;
+    cursor: pointer;
+}
+
+.stus_cell_hlder a:hover {
+    color: #333;
 }
 </style>
