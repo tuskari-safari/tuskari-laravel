@@ -13,7 +13,7 @@ class CountryGuide extends Model
     ];
 
     protected $fillable = [
-        'region',
+        'region_id',
         'name',
         'slug',
         'subtitle',
@@ -45,7 +45,7 @@ class CountryGuide extends Model
 
     public function region(): BelongsTo
     {
-        return $this->belongsTo(Region::class, 'region', 'id');
+        return $this->belongsTo(Region::class, 'region_id');
     }
 
     public function parks(): HasMany
