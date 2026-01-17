@@ -78,7 +78,8 @@ class Safari extends Model
         'is_featured',
         'short_description',
         'is_draft',
-        'step_saved_status'
+        'step_saved_status',
+        'booking_mode'
     ];
 
     protected $appends = [
@@ -233,5 +234,10 @@ class Safari extends Model
 
     public function seasonal_pricings(){
         return $this->hasMany(SeasonalPricing::class, 'safari_id');
+    }
+
+    public function isEnquiryMode(): bool
+    {
+        return $this->booking_mode === 'enquiry';
     }
 }
