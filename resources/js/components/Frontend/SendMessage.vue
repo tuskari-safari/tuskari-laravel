@@ -96,7 +96,7 @@
                                 <div class="each_chat_txt_wrppr">
                                     <div class="chatmsgtxtbx-wpr">
                                         <div class="each_chat_txt_box">
-                                            <p v-if="message.attachment == null"> {{ message.message }}</p>
+                                            <p v-if="message.attachment == null" class="message-text"> {{ message.message }}</p>
                                             <div v-else>
                                                 <div v-if="imgType.includes(message.attachment_type)"
                                                     class="uploaded_imgFile">
@@ -675,5 +675,10 @@ const declineEnquiry = () => {
     gap: 12px;
     justify-content: flex-end;
     margin-top: 16px;
+}
+
+.message-text {
+    white-space: pre-line;
+    margin: 0;
 }
 </style>
