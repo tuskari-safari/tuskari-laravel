@@ -454,7 +454,7 @@
                                             <br>
                                             All payments are securely handled by Tuskari.
                                         </div>
-                                        <div class="col-12" v-if="numberOfAdults || numberOfChildren">
+                                        <div class="col-12" v-if="!isEnquiryMode && (numberOfAdults || numberOfChildren)">
                                             <div class="total-price-box">
                                                 <div class="left">Booking Summary</div>
                                             </div>
@@ -466,7 +466,7 @@
                                                 <span class="cmn-butn mt-2" style="padding: 4px 12px;" v-if="hasDiscountAdultPrice || hasDiscountChildPrice">Group Discount Applied</span>
                                             </div>
                                         </div>
-                                        <div class="col-12">
+                                        <div class="col-12" v-if="!isEnquiryMode">
                                             <div class="total-price-box">
                                                 <div class="left">Total price</div>
                                                 <div class="right">
@@ -483,7 +483,7 @@
                                         <div class="col-12 form_col" v-else>
                                             <input type="submit" :value="isSubmittingEnquiry ? 'Submitting...' : 'Plan with Operator'" :disabled="isSubmittingEnquiry">
                                         </div>
-                                        <div class="col-12 form_col cht-ope">
+                                        <div class="col-12 form_col cht-ope" v-if="!isEnquiryMode">
                                             <button class="cmn-butn" type="button"
                                                 @click.prevent="chatWithOperator(safari?.chat_room_id, safari?.user?.isGroup, [{ 'user': safari?.user }], safari?.user?.full_name)">Still
                                                 got questions? Message the operator. </button>
@@ -655,7 +655,7 @@
                             <br>
                             All payments are securely handled by Tuskari.
                         </p>
-                        <div class="col-12" v-if="numberOfAdults || numberOfChildren">
+                        <div class="col-12" v-if="!isEnquiryMode && (numberOfAdults || numberOfChildren)">
                             <div class="total-price-box">
                                 <div class="left">Booking Summary</div>
                             </div>
@@ -667,7 +667,7 @@
                                 <span class="cmn-butn mt-2" style="padding: 4px 12px;" v-if="hasDiscountAdultPrice || hasDiscountChildPrice">Group Discount Applied</span>
                             </div>
                         </div>
-                        <div class="total-price-box" style="padding-top: 0;">
+                        <div class="total-price-box" style="padding-top: 0;" v-if="!isEnquiryMode">
                             <div class="left">Total price</div>
                             <div class="right">
                                 <div class="price">{{ formatLocalPrice(totalPrice) }}</div>
@@ -676,7 +676,7 @@
                         <div class="mb-rgtavalbty-rgtpnl">
                             <button type="submit" class="cmn-butn" v-if="!isEnquiryMode">Book Now</button>
                             <button type="submit" class="cmn-butn" v-else :disabled="isSubmittingEnquiry">{{ isSubmittingEnquiry ? 'Submitting...' : 'Plan with Operator' }}</button>
-                            <div class=" form_col cht-ope">
+                            <div class=" form_col cht-ope" v-if="!isEnquiryMode">
                                 <button class="cmn-butn" type="button"
                                     @click.prevent="chatWithOperator(safari?.chat_room_id, safari?.user?.isGroup, [{ 'user': safari?.user }], safari?.user?.full_name)">Still
                                     got questions? Message the operator. </button>
@@ -1153,6 +1153,18 @@ const handleEnquiry = () => {
     .then(response => {
         if (response.data.redirect_url) {
             window.toaster.success('Enquiry submitted! Redirecting to messages...');
+
+            // Store chat details so the messages page auto-opens the conversation
+            if (typeof window !== 'undefined' && response.data.chat_room_id) {
+                localStorage.removeItem('chatDetailsData');
+                const chatDetails = {
+                    chatRoom: response.data.chat_room_id,
+                    chatRoomUser: props.safari?.user,
+                    chatName: props.safari?.user?.full_name,
+                };
+                localStorage.setItem('chatDetailsData', JSON.stringify(chatDetails));
+            }
+
             router.visit(response.data.redirect_url);
         }
     })
