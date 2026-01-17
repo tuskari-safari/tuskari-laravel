@@ -224,6 +224,7 @@ class ListingController extends Controller
                 $safari->night_duration = $request->night_duration;
                 $safari->per_date_group_limit = $request->perDateGroupLimit;
                 $safari->environment = $request->environment ? json_encode($request->environment) : NULL;
+                $safari->booking_mode = $request->booking_mode ?? 'booking';
                 $safari->is_draft = 0;
                 $safari->save();
                 SafariAvailableTag::create([
@@ -1288,6 +1289,7 @@ class ListingController extends Controller
                     'per_date_group_limit' => $request->perDateGroupLimit,
                     'is_draft' => 0,
                     'environment' => $request->environment ? json_encode($request->environment) : NULL,
+                    'booking_mode' => $request->booking_mode ?? 'booking',
                 ]);
 
                 if ($request->availabilityTag) {
