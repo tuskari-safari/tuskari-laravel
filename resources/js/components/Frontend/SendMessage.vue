@@ -681,4 +681,27 @@ const declineEnquiry = () => {
     white-space: pre-line;
     margin: 0;
 }
+
+/* Fix chat layout when enquiry panel is present */
+.mssg_bottom_part.tuskri-chtrd-pnl-outr {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.mssg_bottom_part.tuskri-chtrd-pnl-outr .mssg_body_outr {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+    overflow: hidden;
+}
+
+.mssg_bottom_part.tuskri-chtrd-pnl-outr .chat_body {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.mssg_bottom_part.tuskri-chtrd-pnl-outr .chat_stcky_footer {
+    flex-shrink: 0;
+}
 </style>
