@@ -690,7 +690,7 @@ class HomeController extends Controller
         try {
             $sort = $request->input('sort');
             $countryId = $request->input('countryId');
-            $regionData = Region::with(['countryGuides:id,name,region_id'])
+            $regionData = Region::with(['countryGuides:id,name,region'])
                 ->get(['id', 'name'])
                 ->map(function ($region) {
                     return [
