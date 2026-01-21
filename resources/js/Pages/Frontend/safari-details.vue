@@ -481,7 +481,11 @@
                                             <input type="submit" value="Book now">
                                         </div>
                                         <div class="col-12 form_col" v-else>
-                                            <input type="submit" :value="isSubmittingEnquiry ? 'Submitting...' : 'Plan with Operator'" :disabled="isSubmittingEnquiry">
+                                            <!-- Login prompt for non-authenticated users -->
+                                            <div v-if="!$page.props.isLogin" class="enquiry-login-prompt">
+                                                <p>Please <a :href="route('frontend.login')">log in</a> or <a :href="route('frontend.register')">create an account</a> to submit your enquiry.</p>
+                                            </div>
+                                            <input type="submit" :value="isSubmittingEnquiry ? 'Submitting...' : 'Plan with Operator'" :disabled="isSubmittingEnquiry || !$page.props.isLogin">
                                         </div>
                                         <div class="col-12 form_col cht-ope" v-if="!isEnquiryMode">
                                             <button class="cmn-butn" type="button"
@@ -675,7 +679,13 @@
                         </div>
                         <div class="mb-rgtavalbty-rgtpnl">
                             <button type="submit" class="cmn-butn" v-if="!isEnquiryMode">Book Now</button>
-                            <button type="submit" class="cmn-butn" v-else :disabled="isSubmittingEnquiry">{{ isSubmittingEnquiry ? 'Submitting...' : 'Plan with Operator' }}</button>
+                            <template v-else>
+                                <!-- Login prompt for non-authenticated users (mobile) -->
+                                <div v-if="!$page.props.isLogin" class="enquiry-login-prompt">
+                                    <p>Please <a :href="route('frontend.login')">log in</a> or <a :href="route('frontend.register')">create an account</a> to submit your enquiry.</p>
+                                </div>
+                                <button type="submit" class="cmn-butn" :disabled="isSubmittingEnquiry || !$page.props.isLogin">{{ isSubmittingEnquiry ? 'Submitting...' : 'Plan with Operator' }}</button>
+                            </template>
                             <div class=" form_col cht-ope" v-if="!isEnquiryMode">
                                 <button class="cmn-butn" type="button"
                                     @click.prevent="chatWithOperator(safari?.chat_room_id, safari?.user?.isGroup, [{ 'user': safari?.user }], safari?.user?.full_name)">Still
@@ -1194,4 +1204,29 @@ const handleFormSubmit = () => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.enquiry-login-prompt {
+    background: #fff3e0;
+    border: 1px solid #ffcc80;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.enquiry-login-prompt p {
+    margin: 0;
+    font-size: 14px;
+    color: #e65100;
+}
+
+.enquiry-login-prompt a {
+    color: #1976d2;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.enquiry-login-prompt a:hover {
+    color: #0d47a1;
+}
+</style>
