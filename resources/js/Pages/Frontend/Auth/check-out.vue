@@ -84,6 +84,7 @@
                                             <div v-if="bookingData?.is_enquiry_booking" class="enquiry-booking-badge mb-2">
                                                 <span class="badge">Enquiry Booking</span>
                                                 <small>Price agreed with operator</small>
+                                                <small class="d-block text-muted mt-1">Includes conservation and local community contribution</small>
                                             </div>
                                             <div class="bkwrap_head">
                                                 {{ safari?.title ?? 'NA' }} - {{ safari?.location ?? 'NA' }}

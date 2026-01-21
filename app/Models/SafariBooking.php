@@ -45,6 +45,7 @@ class SafariBooking extends Model
         'chat_room_id',
         'enquiry_status',
         'quoted_total_price',
+        'quoted_net_price',
         'quoted_at',
         'traveler_notes',
     ];
@@ -53,6 +54,7 @@ class SafariBooking extends Model
         'is_enquiry' => 'boolean',
         'quoted_at' => 'datetime',
         'quoted_total_price' => 'decimal:2',
+        'quoted_net_price' => 'decimal:2',
     ];
 
     public function safari(): BelongsTo
@@ -64,7 +66,7 @@ class SafariBooking extends Model
     {
         return $this->hasMany(Payment::class, 'booking_id');
     }
-    
+
     public function traveler(): BelongsTo
     {
         return $this->belongsTo(User::class, 'traveler_id');

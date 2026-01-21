@@ -58,11 +58,11 @@ class BookingController extends Controller
             'operator_adult_price' => 'required|numeric|min:1',
             'operator_child_price' => 'nullable',
             'hasDiscountAdultPrice' => 'required|boolean',
-            'hasDiscountChildPrice' => 'required|boolean'
+            'hasDiscountChildPrice' => 'required|boolean',
         ]);
         session()->put('safari_booking', $validatedData);
         $redirectUrl = route('frontend.checkout');
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             $redirectUrl = route('frontend.login');
         }
 
@@ -75,13 +75,13 @@ class BookingController extends Controller
             'safari_id' => 'required|exists:safaris,id',
             'noOfAdults' => 'required|integer|min:1',
             'noOfChildren' => 'nullable|integer|min:0',
-            'season' => 'required|string'
+            'season' => 'required|string',
         ]);
 
         try {
             $safari = Safari::with('group_pricing')->find($request->safari_id);
 
-            if (!$safari) {
+            if (! $safari) {
                 return response()->json([
                     'price' => (float) $request->adultPrice,
                     'has_group_pricing' => false,
@@ -97,7 +97,7 @@ class BookingController extends Controller
                 ->where('person_type', 'ADULT')
                 ->where('count', $numberOfAdults)
                 ->where(function ($q) use ($season) {
-                    $q->where('season', strtolower($season) . '_season')
+                    $q->where('season', strtolower($season).'_season')
                         ->orWhere('season', 'all_year');
                 })
                 ->orderByDesc('count')
@@ -106,7 +106,7 @@ class BookingController extends Controller
             $childGroup = $safari->group_pricing()
                 ->where('person_type', 'CHILD')
                 ->where(function ($q) use ($season) {
-                    $q->where('season', strtolower($season) . '_season')
+                    $q->where('season', strtolower($season).'_season')
                         ->orWhere('season', 'all_year');
                 })
                 ->where('count', $numberOfChildren)
@@ -128,7 +128,7 @@ class BookingController extends Controller
             return response()->json([
                 'price' => (float) $request->adultPrice,
                 'has_group_pricing' => false,
-                'error' => $th->getMessage()
+                'error' => $th->getMessage(),
             ]);
         }
     }
@@ -153,14 +153,14 @@ class BookingController extends Controller
             'hasDiscountAdultPrice' => 'required|boolean',
             'hasDiscountChildPrice' => 'required|boolean',
             'is_enquiry_booking' => 'nullable|boolean',
-            'enquiry_id' => 'nullable|exists:safari_bookings,id'
+            'enquiry_id' => 'nullable|exists:safari_bookings,id',
         ]);
         $safari = Safari::where('id', $validatedData['safari_id'])->first();
         $isEnquiryBooking = $request->is_enquiry_booking ?? false;
         $enquiryId = $request->enquiry_id ?? null;
 
         /** Check if user already has an active booking (skip for enquiry bookings) */
-        if (!$isEnquiryBooking) {
+        if (! $isEnquiryBooking) {
             $alreadyBooked = SafariBooking::where('traveler_id', Auth::id())
                 ->where('status', 'ACTIVE')
                 ->where('safari_id', $validatedData['safari_id'])
@@ -184,7 +184,7 @@ class BookingController extends Controller
                 'amount' => $request->payment_type === 'deposit' ? intval($validatedData['deposit_amount'] * 100) : intval($validatedData['total_payable'] * 100),
                 'currency' => 'USD',
                 'payment_method' => $request->card_id,
-                'description' => $safari->title . ' - ' . $request->duration . ' Booking' . ($isEnquiryBooking ? ' (Enquiry)' : '')
+                'description' => $safari->title.' - '.$request->duration.' Booking'.($isEnquiryBooking ? ' (Enquiry)' : ''),
             ];
 
             if (Auth::user()->stripe_customer_id) {
@@ -222,7 +222,7 @@ class BookingController extends Controller
                     'payment_type' => $request->payment_type === 'deposit' ? 'deposit_auto_payment' : 'pay_in_full',
                     'payment_method_id' => $validatedData['card_id'],
                     'is_full_paid' => $request->payment_type === 'deposit' ? 0 : 1,
-                    'booking_id' => 'TSK-' . $booking->id,
+                    'booking_id' => 'TSK-'.$booking->id,
                 ]);
             } else {
                 $booking = SafariBooking::create([
@@ -248,7 +248,7 @@ class BookingController extends Controller
                     'is_full_paid' => $request->payment_type === 'deposit' ? 0 : 1,
                 ]);
 
-                $booking->update(['booking_id' => 'TSK-' . $booking->id]);
+                $booking->update(['booking_id' => 'TSK-'.$booking->id]);
             }
 
             // Save Payment
@@ -260,7 +260,6 @@ class BookingController extends Controller
                 'payment_status' => 'pending',
                 'payment_method' => $validatedData['card_id'],
             ]);
-
 
             if ($booking->payment_type === 'pay_in_full') {
                 SafariBookingState::create([
@@ -278,17 +277,19 @@ class BookingController extends Controller
             }
             DB::commit();
         } catch (\Exception $e) {
-            Log::error(" :: EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            Log::error(' :: EXCEPTION :: '.$e->getMessage()."\n".$e->getTraceAsString());
             DB::rollBack();
+
             return response()->json(['error' => 'Failed to create booking or payment'], 500);
         }
+
         return response()->json(['message' => 'success', 'client_secret' => $paymentIntent->client_secret]);
     }
 
     public function paymentSuccess(Request $request)
     {
         $request->validate([
-            'payment_intent_id' => 'required|string'
+            'payment_intent_id' => 'required|string',
         ]);
 
         $paymentIntent = PaymentIntent::retrieve($request->payment_intent_id);
@@ -326,18 +327,18 @@ class BookingController extends Controller
 
             if ($booking->payment_type === 'pay_in_full') {
                 $receiver = User::find($booking->operator_id);
-                $notifyDetails["type"] = 'Booking Safari & Paid full';
-                $notifyDetails["title"] = Auth::user()->first_name . ' Booked your Safari ' . $booking->safari->title;
-                $notifyDetails["body"] = Auth::user()->full_name . ' booked your safari and payment has been made in full.';
-                $notifyDetails["safariId"] = $booking->safari->id;
-                $notifyDetails["sender"] = Auth::id();
+                $notifyDetails['type'] = 'Booking Safari & Paid full';
+                $notifyDetails['title'] = Auth::user()->first_name.' Booked your Safari '.$booking->safari->title;
+                $notifyDetails['body'] = Auth::user()->full_name.' booked your safari and payment has been made in full.';
+                $notifyDetails['safariId'] = $booking->safari->id;
+                $notifyDetails['sender'] = Auth::id();
             } else {
                 $receiver = User::find($booking->operator_id);
-                $notifyDetails["type"] = 'Booking Safari & Paid Deposit';
-                $notifyDetails["title"] = Auth::user()->first_name . ' Booked your Safari ' . $booking->safari->title;
-                $notifyDetails["body"] = Auth::user()->full_name . ' booked your safari and payment has been made in deposit.';
-                $notifyDetails["safariId"] = $booking->safari->id;
-                $notifyDetails["sender"] = Auth::id();
+                $notifyDetails['type'] = 'Booking Safari & Paid Deposit';
+                $notifyDetails['title'] = Auth::user()->first_name.' Booked your Safari '.$booking->safari->title;
+                $notifyDetails['body'] = Auth::user()->full_name.' booked your safari and payment has been made in deposit.';
+                $notifyDetails['safariId'] = $booking->safari->id;
+                $notifyDetails['sender'] = Auth::id();
             }
 
             $notify_users = $receiver;
@@ -346,7 +347,7 @@ class BookingController extends Controller
                 'receiptUrl' => $receiptUrl,
                 'operator' => $booking->operator,
                 'traveler' => $booking->traveler,
-                'booking' => $booking
+                'booking' => $booking,
             ];
 
             $operator = $booking->safari->user;
@@ -355,6 +356,7 @@ class BookingController extends Controller
             Mail::to(Auth::user()->email)->queue(new TravelerBookingConfirmation($data));
 
             session()->forget('safari_booking');
+
             return response()->json(['message' => 'Payment status updated']);
         }
 
@@ -364,7 +366,7 @@ class BookingController extends Controller
     public function checkout()
     {
         $bookingData = session('safari_booking');
-        if (!is_array($bookingData) || empty($bookingData)) {
+        if (! is_array($bookingData) || empty($bookingData)) {
             return redirect()->route('frontend.index');
         }
 
@@ -374,7 +376,7 @@ class BookingController extends Controller
         return Inertia::render('Frontend/Auth/check-out', [
             'bookingData' => $bookingData,
             'safari' => $safari,
-            'setting' => $setting
+            'setting' => $setting,
         ]);
     }
 
@@ -382,7 +384,7 @@ class BookingController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->stripe_customer_id) {
+        if (! $user->stripe_customer_id) {
             return response()->json(['error' => 'Stripe customer not found'], 404);
         }
         $paymentMethods = PaymentMethod::all([
@@ -399,15 +401,14 @@ class BookingController extends Controller
         ]);
     }
 
-
     public function createSetupIntent(Request $request)
     {
         $user = $request->user();
 
-        if (!$user->stripe_customer_id) {
+        if (! $user->stripe_customer_id) {
             $customer = Customer::create([
                 'email' => $user->email,
-                'name' => $user->first_name . ' ' . $user->last_name,
+                'name' => $user->first_name.' '.$user->last_name,
             ]);
             $user->stripe_customer_id = $customer->id;
             $user->save();
@@ -488,7 +489,7 @@ class BookingController extends Controller
         try {
             $booking = SafariBooking::find($request->booking_id);
 
-            if (!$booking) {
+            if (! $booking) {
                 return response()->json(['error' => 'Booking not found'], 404);
             }
 
@@ -497,6 +498,7 @@ class BookingController extends Controller
                     'is_full_paid' => $booking->is_full_paid,
                     'payment_type' => $booking->payment_type,
                 ]);
+
                 return response()->json(['error' => 'Invalid booking state'], 400);
             }
 
@@ -511,7 +513,7 @@ class BookingController extends Controller
                 'payment_method' => $booking->payment_method_id,
                 'off_session' => true,
                 'confirm' => true,
-                'description' => $booking?->safari?->title . ' - ' . $booking?->duration . ' Booking'
+                'description' => $booking?->safari?->title.' - '.$booking?->duration.' Booking',
             ];
 
             if (Auth::user()->stripe_customer_id) {
@@ -522,9 +524,10 @@ class BookingController extends Controller
 
             if ($paymentIntent->status !== 'succeeded') {
                 DB::rollBack();
+
                 return response()->json([
                     'error' => 'Payment not completed',
-                    'status' => $paymentIntent->status
+                    'status' => $paymentIntent->status,
                 ], 400);
             }
 
@@ -568,11 +571,11 @@ class BookingController extends Controller
 
             $receiver = User::find($booking->operator_id);
 
-            $notifyDetails["type"] = 'Manual balance payment completed';
-            $notifyDetails["title"] = Auth::user()->first_name . ' completed the balance payment for safari ' . $booking->safari->title;
-            $notifyDetails["body"] = Auth::user()->full_name . ' has paid the remaining balance for your safari.';
-            $notifyDetails["safariId"] = $booking->safari->id;
-            $notifyDetails["sender"] = Auth::id();
+            $notifyDetails['type'] = 'Manual balance payment completed';
+            $notifyDetails['title'] = Auth::user()->first_name.' completed the balance payment for safari '.$booking->safari->title;
+            $notifyDetails['body'] = Auth::user()->full_name.' has paid the remaining balance for your safari.';
+            $notifyDetails['safariId'] = $booking->safari->id;
+            $notifyDetails['sender'] = Auth::id();
 
             $notify_users = $receiver;
             Notification::send($notify_users, new SendNotification($notifyDetails));
@@ -581,7 +584,7 @@ class BookingController extends Controller
                 'receiptUrl' => $receiptUrl,
                 'operator' => $booking->operator,
                 'traveler' => $booking->traveler,
-                'booking' => $booking
+                'booking' => $booking,
             ];
 
             $operator = $booking->safari->user;
@@ -592,9 +595,10 @@ class BookingController extends Controller
             return response()->json(['message' => 'Payment successful'], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("ManualPayment Exception: " . $e->getMessage(), [
+            Log::error('ManualPayment Exception: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
+
             return response()->json(['error' => 'Failed to create booking or payment'], 500);
         }
     }
@@ -608,7 +612,7 @@ class BookingController extends Controller
 
         $booking = SafariBooking::find($request->booking_id);
 
-        if (!$booking) {
+        if (! $booking) {
             return back()->with('error', 'Booking not found');
         }
 
@@ -624,7 +628,7 @@ class BookingController extends Controller
                 $refund = Refund::create([
                     'payment_intent' => $payment->payment_intent_id,
                     'amount' => $stripePrice,
-                    'reason' => 'requested_by_customer'
+                    'reason' => 'requested_by_customer',
                 ]);
 
                 $refundAmount = $payment->amount;
@@ -640,7 +644,7 @@ class BookingController extends Controller
                     $refund = Refund::create([
                         'payment_intent' => $payment->payment_intent_id,
                         'amount' => $stripePrice,
-                        'reason' => 'requested_by_customer'
+                        'reason' => 'requested_by_customer',
                     ]);
 
                     $refundAmount += $payment->amount;
@@ -658,7 +662,7 @@ class BookingController extends Controller
                 $refund = Refund::create([
                     'payment_intent' => $payment->payment_intent_id,
                     'amount' => $stripePrice,
-                    'reason' => 'requested_by_customer'
+                    'reason' => 'requested_by_customer',
                 ]);
 
                 $refundAmount = $payment->amount;
@@ -690,11 +694,11 @@ class BookingController extends Controller
 
             $receiver = User::find($booking->operator_id);
 
-            $notifyDetails["type"] = 'Booking canceled';
-            $notifyDetails["title"] = Auth::user()->first_name . ' Cancelled the Booking for safari ' . $booking->safari->title;
-            $notifyDetails["body"] = Auth::user()->full_name . ' has canceled their booking for your safari.';
-            $notifyDetails["safariId"] = $booking->safari->id;
-            $notifyDetails["sender"] = Auth::id();
+            $notifyDetails['type'] = 'Booking canceled';
+            $notifyDetails['title'] = Auth::user()->first_name.' Cancelled the Booking for safari '.$booking->safari->title;
+            $notifyDetails['body'] = Auth::user()->full_name.' has canceled their booking for your safari.';
+            $notifyDetails['safariId'] = $booking->safari->id;
+            $notifyDetails['sender'] = Auth::id();
 
             $notify_users = $receiver;
             Notification::send($notify_users, new SendNotification($notifyDetails));
@@ -702,7 +706,7 @@ class BookingController extends Controller
             $data = [
                 'operator' => $booking->operator,
                 'traveler' => $booking->traveler,
-                'booking' => $booking
+                'booking' => $booking,
             ];
 
             $operator = $booking->safari->user;
@@ -713,10 +717,11 @@ class BookingController extends Controller
 
             return redirect()
                 ->route('frontend.my-trips')
-                ->with('success', "Booking cancelled successfully");
+                ->with('success', 'Booking cancelled successfully');
         } catch (\Throwable $th) {
             DB::rollBack();
-            Log::error(" :: EXCEPTION :: " . $th->getMessage() . "\n" . $th->getTraceAsString());
+            Log::error(' :: EXCEPTION :: '.$th->getMessage()."\n".$th->getTraceAsString());
+
             return back()->with('error', 'Failed to cancel booking');
         }
     }
@@ -735,7 +740,7 @@ class BookingController extends Controller
 
         $safari = Safari::findOrFail($validatedData['safari_id']);
 
-        if (!$safari->isEnquiryMode()) {
+        if (! $safari->isEnquiryMode()) {
             return response()->json(['error' => 'This safari does not accept enquiries'], 422);
         }
 
@@ -761,7 +766,7 @@ class BookingController extends Controller
                 'payment_status' => 'pending',
             ]);
 
-            $enquiry->update(['booking_id' => 'ENQ-' . $enquiry->id]);
+            $enquiry->update(['booking_id' => 'ENQ-'.$enquiry->id]);
 
             $checkIn = Carbon::parse($validatedData['check_in_date'])->format('M d, Y');
             $checkOut = Carbon::parse($validatedData['check_out_date'])->format('M d, Y');
@@ -776,7 +781,7 @@ class BookingController extends Controller
                 $messageContent .= ", {$children} child(ren)";
             }
             $messageContent .= "\n";
-            if (!empty($validatedData['traveler_notes'])) {
+            if (! empty($validatedData['traveler_notes'])) {
                 $messageContent .= "\nMessage:\n{$validatedData['traveler_notes']}";
             }
 
@@ -789,8 +794,8 @@ class BookingController extends Controller
             $receiver = User::find($operatorId);
             $notifyDetails = [
                 'type' => 'New Enquiry',
-                'title' => Auth::user()->first_name . ' sent an enquiry for ' . $safari->title,
-                'body' => Auth::user()->full_name . ' is interested in your safari and wants to plan the trip with you.',
+                'title' => Auth::user()->first_name.' sent an enquiry for '.$safari->title,
+                'body' => Auth::user()->full_name.' is interested in your safari and wants to plan the trip with you.',
                 'safariId' => $safari->id,
                 'chat_room_id' => $chatRoom->id,
                 'sender' => Auth::id(),
@@ -806,7 +811,8 @@ class BookingController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error(" :: ENQUIRY EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            Log::error(' :: ENQUIRY EXCEPTION :: '.$e->getMessage()."\n".$e->getTraceAsString());
+
             return response()->json(['error' => 'Failed to submit enquiry'], 500);
         }
     }
@@ -815,7 +821,7 @@ class BookingController extends Controller
     {
         $validatedData = $request->validate([
             'enquiry_id' => 'required|exists:safari_bookings,id',
-            'quoted_total_price' => 'required|numeric|min:1',
+            'quoted_net_price' => 'required|numeric|min:1',
         ]);
 
         $enquiry = SafariBooking::with(['safari', 'traveler', 'chatRoom'])
@@ -827,14 +833,20 @@ class BookingController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        if (!in_array($enquiry->enquiry_status, ['pending', 'quoted'])) {
+        if (! in_array($enquiry->enquiry_status, ['pending', 'quoted'])) {
             return response()->json(['error' => 'Cannot quote this enquiry'], 422);
         }
 
         DB::beginTransaction();
         try {
+            $setting = Setting::first();
+            $platformFeePercentage = $setting->platform_fee ?? 13;
+            $netPrice = $validatedData['quoted_net_price'];
+            $travelerTotal = round($netPrice / (1 - ($platformFeePercentage / 100)), 2);
+
             $enquiry->update([
-                'quoted_total_price' => $validatedData['quoted_total_price'],
+                'quoted_net_price' => $netPrice,
+                'quoted_total_price' => $travelerTotal,
                 'enquiry_status' => 'quoted',
                 'quoted_at' => now(),
             ]);
@@ -849,8 +861,8 @@ class BookingController extends Controller
             if ($enquiry->no_of_children > 0) {
                 $messageContent .= ", {$enquiry->no_of_children} child(ren)";
             }
-            $messageContent .= "\n\n";
-            $messageContent .= "Total Price: $" . number_format($validatedData['quoted_total_price'], 2);
+            $messageContent .= "\n\nTotal: $".number_format($travelerTotal, 2);
+            $messageContent .= "\n(Includes conservation and local community contribution)";
 
             Message::create([
                 'chat_room_id' => $enquiry->chat_room_id,
@@ -860,8 +872,8 @@ class BookingController extends Controller
 
             $notifyDetails = [
                 'type' => 'Quote Received',
-                'title' => 'You received a quote for ' . $enquiry->safari->title,
-                'body' => 'The operator has provided a price of $' . number_format($validatedData['quoted_total_price'], 2) . ' for your enquiry.',
+                'title' => 'You received a quote for '.$enquiry->safari->title,
+                'body' => 'The operator has quoted a total of $'.number_format($travelerTotal, 2).' for your enquiry.',
                 'safariId' => $enquiry->safari_id,
                 'chat_room_id' => $enquiry->chat_room_id,
                 'sender' => Auth::id(),
@@ -876,7 +888,8 @@ class BookingController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error(" :: QUOTE EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            Log::error(' :: QUOTE EXCEPTION :: '.$e->getMessage()."\n".$e->getTraceAsString());
+
             return response()->json(['error' => 'Failed to submit quote'], 500);
         }
     }
@@ -914,7 +927,7 @@ class BookingController extends Controller
             $messageContent .= "{$enquiry->traveler->first_name} has accepted your quote for:\n";
             $messageContent .= "Safari: {$enquiry->safari->title}\n";
             $messageContent .= "Dates: {$checkIn} - {$checkOut}\n";
-            $messageContent .= "Total: $" . number_format($enquiry->quoted_total_price, 2);
+            $messageContent .= 'Total: $'.number_format($enquiry->quoted_total_price, 2);
 
             Message::create([
                 'chat_room_id' => $enquiry->chat_room_id,
@@ -922,10 +935,13 @@ class BookingController extends Controller
                 'message' => $messageContent,
             ]);
 
-            $setting = Setting::first();
-            $platformFeePercentage = $setting->platform_fee ?? 13;
-            $platformFee = round(($enquiry->quoted_total_price * $platformFeePercentage) / 100, 2);
-            $payToOperator = $enquiry->quoted_total_price - $platformFee;
+            // Use stored net price, with fallback for legacy quotes
+            $payToOperator = $enquiry->quoted_net_price;
+            if (! $payToOperator) {
+                $setting = Setting::first();
+                $platformFeePercentage = $setting->platform_fee ?? 13;
+                $payToOperator = round($enquiry->quoted_total_price * (1 - ($platformFeePercentage / 100)), 2);
+            }
 
             $bookingData = [
                 'safari_id' => $enquiry->safari_id,
@@ -949,8 +965,8 @@ class BookingController extends Controller
 
             $notifyDetails = [
                 'type' => 'Enquiry Confirmed',
-                'title' => Auth::user()->first_name . ' confirmed your quote for ' . $enquiry->safari->title,
-                'body' => Auth::user()->full_name . ' has accepted your quote and is proceeding to payment.',
+                'title' => Auth::user()->first_name.' confirmed your quote for '.$enquiry->safari->title,
+                'body' => Auth::user()->full_name.' has accepted your quote and is proceeding to payment.',
                 'safariId' => $enquiry->safari_id,
                 'chat_room_id' => $enquiry->chat_room_id,
                 'sender' => Auth::id(),
@@ -965,7 +981,8 @@ class BookingController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error(" :: CONFIRM EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            Log::error(' :: CONFIRM EXCEPTION :: '.$e->getMessage()."\n".$e->getTraceAsString());
+
             return response()->json(['error' => 'Failed to confirm enquiry'], 500);
         }
     }
@@ -1003,8 +1020,8 @@ class BookingController extends Controller
 
             $messageContent = "❌ Enquiry Declined\n\n";
             $messageContent .= "The enquiry for {$enquiry->safari->title} has been declined by ";
-            $messageContent .= $isOperator ? "the operator" : "the traveler";
-            if (!empty($validatedData['reason'])) {
+            $messageContent .= $isOperator ? 'the operator' : 'the traveler';
+            if (! empty($validatedData['reason'])) {
                 $messageContent .= ".\n\nReason: {$validatedData['reason']}";
             }
 
@@ -1017,8 +1034,8 @@ class BookingController extends Controller
             $notifyUser = $isOperator ? $enquiry->traveler : $enquiry->operator;
             $notifyDetails = [
                 'type' => 'Enquiry Declined',
-                'title' => 'Enquiry for ' . $enquiry->safari->title . ' has been declined',
-                'body' => $declinedBy->full_name . ' has declined the enquiry.',
+                'title' => 'Enquiry for '.$enquiry->safari->title.' has been declined',
+                'body' => $declinedBy->full_name.' has declined the enquiry.',
                 'safariId' => $enquiry->safari_id,
                 'chat_room_id' => $enquiry->chat_room_id,
                 'sender' => Auth::id(),
@@ -1032,7 +1049,8 @@ class BookingController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error(" :: DECLINE EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            Log::error(' :: DECLINE EXCEPTION :: '.$e->getMessage()."\n".$e->getTraceAsString());
+
             return response()->json(['error' => 'Failed to decline enquiry'], 500);
         }
     }
@@ -1050,7 +1068,7 @@ class BookingController extends Controller
             ->latest()
             ->first();
 
-        if (!$enquiry) {
+        if (! $enquiry) {
             return response()->json(['enquiry' => null]);
         }
 
@@ -1079,11 +1097,11 @@ class BookingController extends Controller
             return $existingRoom;
         }
 
-        $chatRoom = new ChatRoom();
+        $chatRoom = new ChatRoom;
         $chatRoom->is_group = 0;
         $chatRoom->save();
 
-        ChatRoom::where('id', $chatRoom->id)->update(['group_id' => 'grp-' . $chatRoom->id]);
+        ChatRoom::where('id', $chatRoom->id)->update(['group_id' => 'grp-'.$chatRoom->id]);
 
         Member::insert([
             ['chat_room_id' => $chatRoom->id, 'user_id' => $userId],

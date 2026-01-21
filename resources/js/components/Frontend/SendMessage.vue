@@ -19,13 +19,16 @@
             <!-- Operator: Quote Form (pending status) -->
             <div v-if="isOperator && enquiry.enquiry_status === 'pending'" class="enquiry-actions">
                 <div class="quote-form">
-                    <label>Total Price (includes 13% platform fee)</label>
+                    <label>Your price (amount you'll receive)</label>
                     <div class="quote-input-row">
                         <span class="currency-symbol">$</span>
-                        <input type="number" v-model="quoteAmount" min="1" step="0.01" placeholder="Enter total price" class="quote-input" />
-                        <button @click="submitQuote" :disabled="isSubmittingQuote || !quoteAmount" class="cmn-butn quote-btn">
+                        <input type="number" v-model="quoteNetAmount" min="1" step="0.01" placeholder="Enter your price" class="quote-input" />
+                        <button @click="submitQuote" :disabled="isSubmittingQuote || !quoteNetAmount" class="cmn-butn quote-btn">
                             {{ isSubmittingQuote ? 'Sending...' : 'Send Quote' }}
                         </button>
+                    </div>
+                    <div v-if="quoteNetAmount > 0" class="traveler-total-preview">
+                        <small>Traveler will pay: <strong>${{ calculateTravelerTotal(quoteNetAmount) }}</strong></small>
                     </div>
                 </div>
             </div>
@@ -33,7 +36,8 @@
             <!-- Operator: Quote sent (quoted status) -->
             <div v-if="isOperator && enquiry.enquiry_status === 'quoted'" class="enquiry-actions">
                 <div class="quoted-info">
-                    <p>Quote sent: <strong>${{ formatPrice(enquiry.quoted_total_price) }}</strong></p>
+                    <p>Your price: <strong>${{ formatPrice(enquiry.quoted_net_price) }}</strong></p>
+                    <p>Traveler pays: <strong>${{ formatPrice(enquiry.quoted_total_price) }}</strong></p>
                     <p class="text-muted">Waiting for traveler to confirm...</p>
                 </div>
             </div>
@@ -41,7 +45,8 @@
             <!-- Traveler: View quote & confirm/decline (quoted status) -->
             <div v-if="!isOperator && enquiry.enquiry_status === 'quoted'" class="enquiry-actions">
                 <div class="quote-received">
-                    <p class="quote-price">Quoted Price: <strong>${{ formatPrice(enquiry.quoted_total_price) }}</strong></p>
+                    <p class="quote-price">Total: <strong>${{ formatPrice(enquiry.quoted_total_price) }}</strong></p>
+                    <p class="contribution-note">Includes conservation and local community contribution</p>
                     <div class="action-buttons">
                         <button @click="confirmEnquiry" :disabled="isProcessing" class="cmn-butn confirm-btn">
                             {{ isProcessing ? 'Processing...' : 'Confirm & Pay' }}
@@ -173,12 +178,16 @@ const isItFirstMessage = ref(false);
 // Enquiry-related state
 const enquiry = ref(null);
 const isOperator = ref(false);
-const quoteAmount = ref('');
+const quoteNetAmount = ref('');
 const isSubmittingQuote = ref(false);
 const isProcessing = ref(false);
 const showDeclineModal = ref(false);
 const declineReason = ref('');
 const isDeclining = ref(false);
+
+const calculateTravelerTotal = (netPrice) => {
+    return (parseFloat(netPrice) / 0.87).toFixed(2);
+};
 
 chatName.value = props.roomDetails.chatName;
 chatRoomId.value = props.roomDetails.chatRoom;
@@ -399,17 +408,17 @@ const capitalizeFirst = (str) => {
 };
 
 const submitQuote = () => {
-    if (!quoteAmount.value || isSubmittingQuote.value) return;
+    if (!quoteNetAmount.value || isSubmittingQuote.value) return;
 
     isSubmittingQuote.value = true;
     axios.post(route('frontend.quote-enquiry'), {
         enquiry_id: enquiry.value.id,
-        quoted_total_price: quoteAmount.value
+        quoted_net_price: quoteNetAmount.value
     })
     .then((response) => {
         toaster.success('Quote sent successfully!');
         enquiry.value = response.data.enquiry;
-        quoteAmount.value = '';
+        quoteNetAmount.value = '';
         // Refresh messages to show the quote message
         currentPage.value = 0;
         lastPage.value = null;
@@ -593,7 +602,23 @@ const declineEnquiry = () => {
 
 .quote-received .quote-price {
     font-size: 18px;
+    margin-bottom: 4px;
+}
+
+.traveler-total-preview {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #e8f5e9;
+    border-radius: 6px;
+    color: #2e7d32;
+}
+
+.contribution-note {
+    font-size: 12px;
+    color: #666;
+    margin-top: 0;
     margin-bottom: 12px;
+    font-style: italic;
 }
 
 .action-buttons {
