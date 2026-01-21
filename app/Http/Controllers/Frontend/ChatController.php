@@ -9,10 +9,10 @@ use App\Events\SendNotificationEvent;
 use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
 use App\Models\ChatDeletion;
-use Illuminate\Support\Str;
 use App\Models\ChatRoom;
 use App\Models\Member;
 use App\Models\Message;
+use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\SendNotification;
 use Illuminate\Http\Request;
@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -43,7 +44,7 @@ class ChatController extends Controller
                         ->limit(1);
                 }, 'desc')
                 ->when($request->searchChatUser, function ($query) use ($request) {
-                    $searchTerm = '%' . trim($request->searchChatUser) . '%';
+                    $searchTerm = '%'.trim($request->searchChatUser).'%';
                     $query->where(function ($q) use ($searchTerm) {
                         $q->where('chat_name', 'like', $searchTerm)
                             ->orWhereHas('chatMembers.user', function ($qq) use ($searchTerm) {
@@ -61,12 +62,18 @@ class ChatController extends Controller
                         // Hide chat if no new messages after deletion
                         return false;
                     }
+
                     return true;
                 })
                 ->values();
-            return Inertia::render('Frontend/Auth/messages', ['chat_list' => $chat_list]);
+            $setting = Setting::first();
+
+            return Inertia::render('Frontend/Auth/messages', [
+                'chat_list' => $chat_list,
+                'setting' => $setting,
+            ]);
         } catch (\Throwable $th) {
-            Log::error(" :: EXCEPTION :: " . $th->getMessage() . "\n" . $th->getTraceAsString());
+            Log::error(' :: EXCEPTION :: '.$th->getMessage()."\n".$th->getTraceAsString());
             abort(500);
         }
     }
@@ -74,9 +81,9 @@ class ChatController extends Controller
     public function reverb()
     {
         try {
-            broadcast(new ChatMessageEvent("connected"))->toOthers();
+            broadcast(new ChatMessageEvent('connected'))->toOthers();
         } catch (\Throwable $th) {
-            Log::error(" :: EXCEPTION :: " . $th->getMessage() . "\n" . $th->getTraceAsString());
+            Log::error(' :: EXCEPTION :: '.$th->getMessage()."\n".$th->getTraceAsString());
             abort(500);
         }
     }
@@ -86,7 +93,7 @@ class ChatController extends Controller
         try {
             return Inertia::render('Output');
         } catch (\Throwable $th) {
-            Log::error(" :: EXCEPTION :: " . $th->getMessage() . "\n" . $th->getTraceAsString());
+            Log::error(' :: EXCEPTION :: '.$th->getMessage()."\n".$th->getTraceAsString());
             abort(500);
         }
     }
@@ -96,7 +103,7 @@ class ChatController extends Controller
         try {
             return Inertia::render('Admin/chat/List');
         } catch (\Throwable $th) {
-            Log::error(" :: EXCEPTION :: " . $th->getMessage() . "\n" . $th->getTraceAsString());
+            Log::error(' :: EXCEPTION :: '.$th->getMessage()."\n".$th->getTraceAsString());
             abort(500);
         }
     }
@@ -118,7 +125,7 @@ class ChatController extends Controller
                         ->limit(1);
                 }, 'desc')
                 ->when($request->search, function ($query) use ($request) {
-                    $searchTerm = '%' . trim($request->search) . '%';
+                    $searchTerm = '%'.trim($request->search).'%';
 
                     $query->where(function ($q) use ($searchTerm) {
                         $q->where('chat_name', 'like', $searchTerm)
@@ -131,7 +138,7 @@ class ChatController extends Controller
 
             return response()->json(['chat_list' => $chat_list]);
         } catch (\Throwable $th) {
-            Log::error(" :: EXCEPTION :: " . $th->getMessage() . "\n" . $th->getTraceAsString());
+            Log::error(' :: EXCEPTION :: '.$th->getMessage()."\n".$th->getTraceAsString());
             abort(500);
         }
     }
@@ -141,7 +148,7 @@ class ChatController extends Controller
         try {
             $chatRoom = ChatRoom::find($request->id);
             $isMember = $chatRoom->chatMembers()->where('user_id', Auth::id())->exists();
-            if (!$isMember) {
+            if (! $isMember) {
                 return response()->json(['success' => false, 'error' => 'User not found'], 403);
             }
             $otherUserDeleted = ChatDeletion::where('chat_room_id', $chatRoom->id)
@@ -159,10 +166,12 @@ class ChatController extends Controller
                     ['deleted_at' => now(), 'updated_at' => now(), 'created_at' => now()]
                 );
             }
+
             return redirect()->route('frontend.messages')
                 ->with('success', 'Chat deleted successfully');
         } catch (\Throwable $th) {
-            Log::error('Error:: while deleting chat room ' . $th->getMessage());
+            Log::error('Error:: while deleting chat room '.$th->getMessage());
+
             return response()->json(['success' => false, 'error' => 'Something went wrong on server side'], 500);
         }
     }
@@ -192,9 +201,10 @@ class ChatController extends Controller
             if ($messages->isEmpty()) {
                 return response()->json(['chatRoom' => $chatRoom, 'code' => 404]);
             }
+
             return response()->json(['chatRoom' => $chatRoom, 'messages' => $messages]);
         } catch (\Throwable $th) {
-            Log::error(" :: EXCEPTION :: " . $th->getMessage() . "\n" . $th->getTraceAsString());
+            Log::error(' :: EXCEPTION :: '.$th->getMessage()."\n".$th->getTraceAsString());
             abort(500);
         }
     }
@@ -205,7 +215,7 @@ class ChatController extends Controller
         $request->validate([
             'isNewUser' => ['nullable', Rule::notIn([Auth::id()])],
             'sendChat' => 'nullable',
-            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,doc,docx,pdf|max:2048'
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,doc,docx,pdf|max:2048',
         ]);
 
         try {
@@ -218,16 +228,16 @@ class ChatController extends Controller
                 $new_chat_room->is_group = 0;
                 $new_chat_room->save();
 
-                ChatRoom::where('id', $new_chat_room->id)->update(['group_id' => 'grp-' . $new_chat_room->id]);
+                ChatRoom::where('id', $new_chat_room->id)->update(['group_id' => 'grp-'.$new_chat_room->id]);
 
                 $members = [
                     ['chat_room_id' => $new_chat_room->id, 'user_id' => $logged_user_id],
-                    ['chat_room_id' => $new_chat_room->id, 'user_id' => $newuser]
+                    ['chat_room_id' => $new_chat_room->id, 'user_id' => $newuser],
                 ];
                 Member::insert($members);
             }
             $chat_room_id = ($request->chatRoom != null) ? $request->chatRoom : $new_chat_room->id;
-            $message = new Message();
+            $message = new Message;
             $message->chat_room_id = $chat_room_id;
             $message->user_id = $logged_user_id;
             if ($request->isMessage == 1) {
@@ -261,13 +271,13 @@ class ChatController extends Controller
                 /** Send Notification */
                 $receiver = User::find($user->id);
                 $sender = Auth::user();
-                $notifyDetails["type"] = 'Message Receive';
-                $notifyDetails["title"] = ($sender->role_name === 'SAFARI_OPERATOR' ? '@ ' : '') . $sender->first_name . ' Sent you a message';
-                $notifyDetails["body"] = $request->sendChat
-                    ? $sender->full_name . ' sent you a message: "' . Str::limit($request->sendChat, 50, '...') . '"'
-                    : $sender->full_name . ' sent you a file';
-                $notifyDetails["chat_room_id"] = $message->chat_room_id;
-                $notifyDetails["sender"] = Auth::id();
+                $notifyDetails['type'] = 'Message Receive';
+                $notifyDetails['title'] = ($sender->role_name === 'SAFARI_OPERATOR' ? '@ ' : '').$sender->first_name.' Sent you a message';
+                $notifyDetails['body'] = $request->sendChat
+                    ? $sender->full_name.' sent you a message: "'.Str::limit($request->sendChat, 50, '...').'"'
+                    : $sender->full_name.' sent you a file';
+                $notifyDetails['chat_room_id'] = $message->chat_room_id;
+                $notifyDetails['sender'] = Auth::id();
                 $notify_users = $receiver;
                 Notification::send($notify_users, new SendNotification($notifyDetails));
             }
@@ -283,7 +293,7 @@ class ChatController extends Controller
 
             return response()->json(['code' => 200, 'message' => $sendMessage, 'newChat' => $newChat, 'chatRoom' => $chatRoom]);
         } catch (\Throwable $th) {
-            Log::error(" :: EXCEPTION :: " . $th->getMessage() . "\n" . $th->getTraceAsString());
+            Log::error(' :: EXCEPTION :: '.$th->getMessage()."\n".$th->getTraceAsString());
             abort(500);
         }
     }
@@ -298,7 +308,7 @@ class ChatController extends Controller
                     $q->whereIn('name', ['SUPER-ADMIN', 'YOGA-CHAPLAINS']);
                 })
                 ->when($request->search, function ($query) use ($request) {
-                    $searchTerm = '%' . trim($request->search) . '%';
+                    $searchTerm = '%'.trim($request->search).'%';
                     $query->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$searchTerm]);
                 })
                 ->get();
@@ -317,9 +327,11 @@ class ChatController extends Controller
                     }
                 }
             }
+
             return response()->json(['success' => true, 'users' => $users], 200);
         } catch (\Throwable $th) {
-            Log::error('Error:: while getting users ' . $th->getMessage());
+            Log::error('Error:: while getting users '.$th->getMessage());
+
             return response()->json(['success' => false, 'users' => [], 'error' => 'Server error occurred'], 500);
         }
     }
@@ -348,17 +360,17 @@ class ChatController extends Controller
             }
 
             // ======= update group id with grp prefix ===========
-            ChatRoom::where('id', $new_chat_room->id)->update(['group_id' => 'grp-' . $new_chat_room->id]);
+            ChatRoom::where('id', $new_chat_room->id)->update(['group_id' => 'grp-'.$new_chat_room->id]);
 
             $newGroup = ChatRoom::with(['chatMembers' => function ($query) {
                 $query->where('user_id', '!=', Auth::id())->limit(1);
             }, 'chatMembers.user'])
                 ->find($new_chat_room->id);
 
-
             return response()->json(['success' => true, 'status_code' => 200, 'message' => 'Chat Group created successfully', 'data' => $newGroup]);
         } catch (\Throwable $th) {
-            Log::error('Error:: while creating chat groups ' . $th->getMessage());
+            Log::error('Error:: while creating chat groups '.$th->getMessage());
+
             return response()->json(['success' => false, 'error' => 'Something went wrong in server side'], 500);
         }
     }
@@ -368,7 +380,7 @@ class ChatController extends Controller
         try {
             $members = Member::with('user')->where('chat_room_id', $chat_room_id)
                 ->when($request->search, function ($query) use ($request) {
-                    $searchTerm = '%' . trim($request->search) . '%';
+                    $searchTerm = '%'.trim($request->search).'%';
                     $query->whereHas('user', function ($q) use ($searchTerm) {
                         $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$searchTerm]);
                     });
@@ -395,7 +407,8 @@ class ChatController extends Controller
 
             return response()->json(['success' => true, 'status_code' => 200, 'chat_members' => $members]);
         } catch (\Throwable $th) {
-            Log::error('Error:: while creating chat groups ' . $th->getMessage());
+            Log::error('Error:: while creating chat groups '.$th->getMessage());
+
             return response()->json(['success' => false, 'error' => 'Something went wrong in server side'], 500);
         }
     }
@@ -409,7 +422,8 @@ class ChatController extends Controller
 
             return response()->json(['success' => true, 'status_code' => 200, 'message' => 'Message deleted successfully']);
         } catch (\Throwable $th) {
-            Log::error('Error:: while deleting message ' . $th->getMessage());
+            Log::error('Error:: while deleting message '.$th->getMessage());
+
             return response()->json(['success' => false, 'error' => 'Something went wrong in server side'], 500);
         }
     }
@@ -425,6 +439,7 @@ class ChatController extends Controller
         if ($user) {
             $user->update(['last_seen_at' => now()->setTimezone('Asia/Kolkata')]);
         }
+
         return response()->json(['status' => 'updated']);
     }
 
@@ -445,7 +460,7 @@ class ChatController extends Controller
                     ->limit(1);
             }, 'desc')
             ->when($request->searchChatUser, function ($query) use ($request) {
-                $searchTerm = '%' . trim($request->searchChatUser) . '%';
+                $searchTerm = '%'.trim($request->searchChatUser).'%';
                 $query->where(function ($q) use ($searchTerm) {
                     $q->where('chat_name', 'like', $searchTerm)
                         ->orWhereHas('chatMembers.user', function ($qq) use ($searchTerm) {
@@ -463,10 +478,10 @@ class ChatController extends Controller
                     // Hide chat if no new messages after deletion
                     return false;
                 }
+
                 return true;
             })
             ->values();
-
 
         if ($chat_list->isEmpty()) {
             return response()->json(['chat_list' => [], 'message' => 'No chat found', 'code' => 404]);

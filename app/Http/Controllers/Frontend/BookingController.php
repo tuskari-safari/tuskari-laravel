@@ -842,7 +842,7 @@ class BookingController extends Controller
             $setting = Setting::first();
             $platformFeePercentage = $setting->platform_fee ?? 13;
             $netPrice = $validatedData['quoted_net_price'];
-            $travelerTotal = round($netPrice / (1 - ($platformFeePercentage / 100)), 2);
+            $travelerTotal = round($netPrice * (1 + ($platformFeePercentage / 100)), 2);
 
             $enquiry->update([
                 'quoted_net_price' => $netPrice,
@@ -940,7 +940,7 @@ class BookingController extends Controller
             if (! $payToOperator) {
                 $setting = Setting::first();
                 $platformFeePercentage = $setting->platform_fee ?? 13;
-                $payToOperator = round($enquiry->quoted_total_price * (1 - ($platformFeePercentage / 100)), 2);
+                $payToOperator = round($enquiry->quoted_total_price / (1 + ($platformFeePercentage / 100)), 2);
             }
 
             $bookingData = [
