@@ -369,15 +369,13 @@
                     <div class="av-form-wrap">
                         <div class="form-outer" v-if="canBook">
                             <div class="form-title-bx">
-                                <div class="form-head">Book Your Safari</div>
-                                <!-- <p v-if="hasFutureAvailability">Check your booking
-                                    availability</p>
-                                <h6 v-else>This safari is no longer available for booking</h6> -->
-                                <p>Check live availability and pricing in seconds.</p>
+                                <div class="form-head">{{ isEnquiryMode ? 'Plan with Operator' : 'Book Your Safari' }}</div>
+                                <p v-if="isEnquiryMode">Tell us about your trip and the operator will get back to you with a custom quote.</p>
+                                <p v-else>Check live availability and pricing in seconds.</p>
                             </div>
                             <!-- <div v-if="hasFutureAvailability" class="form_box"> -->
                             <div class="form_box">
-                                <form @submit.prevent="handleBookSafari">
+                                <form @submit.prevent="handleFormSubmit">
                                     <div class="row form_row">
                                         <div class="col-6 form_col">
                                             <label>Travel dates</label>
@@ -443,12 +441,20 @@
                                             }}</span>
 
                                         </div>
+                                        <div class="col-12 form_col" v-if="isEnquiryMode">
+                                            <label>Message to Operator (optional)</label>
+                                            <div class="input_hldr">
+                                                <textarea v-model="travelerNotes" rows="3"
+                                                    placeholder="Tell us about your trip preferences, special requests, or any questions you have..."></textarea>
+                                            </div>
+                                            <span class="text-danger" v-if="errors?.traveler_notes">{{ errors?.traveler_notes }}</span>
+                                        </div>
                                         <div class="cmn-sub-inpt-txt">
                                             This trip is offered and operated by {{ safari?.user?.business_name }}.
                                             <br>
                                             All payments are securely handled by Tuskari.
                                         </div>
-                                        <div class="col-12" v-if="numberOfAdults || numberOfChildren">
+                                        <div class="col-12" v-if="!isEnquiryMode && (numberOfAdults || numberOfChildren)">
                                             <div class="total-price-box">
                                                 <div class="left">Booking Summary</div>
                                             </div>
@@ -460,7 +466,7 @@
                                                 <span class="cmn-butn mt-2" style="padding: 4px 12px;" v-if="hasDiscountAdultPrice || hasDiscountChildPrice">Group Discount Applied</span>
                                             </div>
                                         </div>
-                                        <div class="col-12">
+                                        <div class="col-12" v-if="!isEnquiryMode">
                                             <div class="total-price-box">
                                                 <div class="left">Total price</div>
                                                 <div class="right">
@@ -471,10 +477,13 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-12 form_col">
+                                        <div class="col-12 form_col" v-if="!isEnquiryMode">
                                             <input type="submit" value="Book now">
                                         </div>
-                                        <div class="col-12 form_col cht-ope">
+                                        <div class="col-12 form_col" v-else>
+                                            <input type="submit" :value="isSubmittingEnquiry ? 'Submitting...' : 'Plan with Operator'" :disabled="isSubmittingEnquiry">
+                                        </div>
+                                        <div class="col-12 form_col cht-ope" v-if="!isEnquiryMode">
                                             <button class="cmn-butn" type="button"
                                                 @click.prevent="chatWithOperator(safari?.chat_room_id, safari?.user?.isGroup, [{ 'user': safari?.user }], safari?.user?.full_name)">Still
                                                 got questions? Message the operator. </button>
@@ -549,7 +558,7 @@
                 <Icon icon="fa7-solid:angle-up" v-if="!isOpenBookingModal" />
                 <Icon icon="pepicons-pop:angle-down" v-if="isOpenBookingModal" />
             </a>
-            <form @submit.prevent="handleBookSafari">
+            <form @submit.prevent="handleFormSubmit">
                 <div class="mb-rgtavalbty-wrpr">
                     <div v-if="!totalPrice && !durationText && !checkInDate && !checkOutDate && !isOpenBookingModal"
                         class="mb-rgtavalbty-lftpnl slect-avlblty-hdr">
@@ -569,12 +578,13 @@
                                     "MMM DD") }}</div>
                         </div>
                     </template>
-                    <button type="button'" class="cmn-butn" v-if="!isOpenBookingModal">Book Now</button>
+                    <button type="button'" class="cmn-butn" v-if="!isOpenBookingModal">{{ isEnquiryMode ? 'Plan with Operator' : 'Book Now' }}</button>
                 </div>
                 <div v-if="isOpenBookingModal" class="form_box">
                     <div class="form-title-bx">
-                        <div class="form-head">Book Your Safari</div>
-                        <p style="font-size: 14px;">Check live availability and pricing in seconds.</p>
+                        <div class="form-head">{{ isEnquiryMode ? 'Plan with Operator' : 'Book Your Safari' }}</div>
+                        <p v-if="isEnquiryMode" style="font-size: 14px;">Tell us about your trip and the operator will get back to you with a custom quote.</p>
+                        <p v-else style="font-size: 14px;">Check live availability and pricing in seconds.</p>
                     </div>
                     <div class="row form_row">
                         <div class="col-12 form_col">
@@ -632,12 +642,20 @@
                             <span class="text-danger" v-if="errors?.duration">{{ errors?.duration
                             }}</span>
                         </div>
+                        <div class="col-12 form_col" v-if="isEnquiryMode">
+                            <label>Message to Operator (optional)</label>
+                            <div class="input_hldr">
+                                <textarea v-model="travelerNotes" rows="3"
+                                    placeholder="Tell us about your trip preferences, special requests, or any questions you have..."></textarea>
+                            </div>
+                            <span class="text-danger" v-if="errors?.traveler_notes">{{ errors?.traveler_notes }}</span>
+                        </div>
 
                         <p>This trip is offered and operated by {{ safari?.user?.business_name }}.
                             <br>
                             All payments are securely handled by Tuskari.
                         </p>
-                        <div class="col-12" v-if="numberOfAdults || numberOfChildren">
+                        <div class="col-12" v-if="!isEnquiryMode && (numberOfAdults || numberOfChildren)">
                             <div class="total-price-box">
                                 <div class="left">Booking Summary</div>
                             </div>
@@ -649,15 +667,16 @@
                                 <span class="cmn-butn mt-2" style="padding: 4px 12px;" v-if="hasDiscountAdultPrice || hasDiscountChildPrice">Group Discount Applied</span>
                             </div>
                         </div>
-                        <div class="total-price-box" style="padding-top: 0;">
+                        <div class="total-price-box" style="padding-top: 0;" v-if="!isEnquiryMode">
                             <div class="left">Total price</div>
                             <div class="right">
                                 <div class="price">{{ formatLocalPrice(totalPrice) }}</div>
                             </div>
                         </div>
                         <div class="mb-rgtavalbty-rgtpnl">
-                            <button type="button'" class="cmn-butn">Book Now</button>
-                            <div class=" form_col cht-ope">
+                            <button type="submit" class="cmn-butn" v-if="!isEnquiryMode">Book Now</button>
+                            <button type="submit" class="cmn-butn" v-else :disabled="isSubmittingEnquiry">{{ isSubmittingEnquiry ? 'Submitting...' : 'Plan with Operator' }}</button>
+                            <div class=" form_col cht-ope" v-if="!isEnquiryMode">
                                 <button class="cmn-butn" type="button"
                                     @click.prevent="chatWithOperator(safari?.chat_room_id, safari?.user?.isGroup, [{ 'user': safari?.user }], safari?.user?.full_name)">Still
                                     got questions? Message the operator. </button>
@@ -721,6 +740,8 @@ const numberOfAdults = ref(parsed?.number_of_adults ?? '');
 const numberOfChildren = ref(parsed?.number_of_children ?? '');
 const errors = ref([]);
 const isOpenBookingModal = ref(false);
+const travelerNotes = ref('');
+const isSubmittingEnquiry = ref(false);
 const showDialog = ref(false);
 const activeSection = ref('trip-overview');
 const dayDuration = Number(props.safari.day_duration);
@@ -1111,6 +1132,66 @@ const isOpenBookingModalonClick = () => {
     isOpenBookingModal.value = !isOpenBookingModal.value;
     document.body.classList.toggle("no-scroll", isOpenBookingModal.value);
 }
+
+const isEnquiryMode = computed(() => {
+    return props.safari?.booking_mode === 'enquiry';
+});
+
+const handleEnquiry = () => {
+    if (isSubmittingEnquiry.value) return;
+    isSubmittingEnquiry.value = true;
+
+    axios.post(route('frontend.create-enquiry'), {
+        safari_id: props.safari.id,
+        check_in_date: checkInDate.value,
+        check_out_date: checkOutDate.value,
+        number_of_adults: numberOfAdults.value,
+        number_of_children: numberOfChildren.value || 0,
+        duration: durationText.value,
+        traveler_notes: travelerNotes.value,
+    })
+    .then(response => {
+        if (response.data.redirect_url) {
+            window.toaster.success('Enquiry submitted! Redirecting to messages...');
+
+            // Store chat details so the messages page auto-opens the conversation
+            if (typeof window !== 'undefined' && response.data.chat_room_id) {
+                localStorage.removeItem('chatDetailsData');
+                const chatDetails = {
+                    chatRoom: response.data.chat_room_id,
+                    chatRoomUser: props.safari?.user,
+                    chatName: props.safari?.user?.full_name,
+                };
+                localStorage.setItem('chatDetailsData', JSON.stringify(chatDetails));
+            }
+
+            router.visit(response.data.redirect_url);
+        }
+    })
+    .catch(err => {
+        if (err.response?.data?.errors) {
+            errors.value = err.response.data.errors;
+        } else if (err.response?.data?.error) {
+            window.toaster.error(err.response.data.error);
+        } else {
+            window.toaster.error('Failed to submit enquiry. Please try again.');
+        }
+        if (!isOpenBookingModal.value) {
+            isOpenBookingModal.value = true;
+        }
+    })
+    .finally(() => {
+        isSubmittingEnquiry.value = false;
+    });
+};
+
+const handleFormSubmit = () => {
+    if (isEnquiryMode.value) {
+        handleEnquiry();
+    } else {
+        handleBookSafari();
+    }
+};
 </script>
 
 <style scoped></style>

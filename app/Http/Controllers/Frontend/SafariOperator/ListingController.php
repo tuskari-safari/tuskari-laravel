@@ -224,6 +224,7 @@ class ListingController extends Controller
                 $safari->night_duration = $request->night_duration;
                 $safari->per_date_group_limit = $request->perDateGroupLimit;
                 $safari->environment = $request->environment ? json_encode($request->environment) : NULL;
+                $safari->booking_mode = $request->booking_mode ?? 'booking';
                 $safari->is_draft = 0;
                 $safari->save();
                 SafariAvailableTag::create([
@@ -508,6 +509,7 @@ class ListingController extends Controller
                     $safari->travel_season = implode(', ', $request->seasons ?? []);
                     $safari->day_duration = $request->day_duration;
                     $safari->night_duration = $request->night_duration;
+                    $safari->booking_mode = $request->booking_mode ?? 'booking';
                     $safari->save();
 
                     // Save thumbnail
@@ -1288,6 +1290,7 @@ class ListingController extends Controller
                     'per_date_group_limit' => $request->perDateGroupLimit,
                     'is_draft' => 0,
                     'environment' => $request->environment ? json_encode($request->environment) : NULL,
+                    'booking_mode' => $request->booking_mode ?? 'booking',
                 ]);
 
                 if ($request->availabilityTag) {
@@ -1753,7 +1756,7 @@ class ListingController extends Controller
 
     public function getCountries(Request $request)
     {
-        $countries = CountryGuide::where('region_id', $request->region_id)->get(['id', 'name']);
+        $countries = CountryGuide::where('region', $request->region_id)->get(['id', 'name']);
         return response()->json($countries);
     }
 

@@ -77,6 +77,10 @@ Route::middleware(['auth', 'frontend.auth:TRAVELLER'])->group(function () {
     Route::get('view-review/{id}', [UserController::class, 'viewReview'])->name('view-review');
     Route::get('my-trips', [UserController::class, 'myTrips'])->name('my-trips');
     Route::post('cancel-booking', [BookingController::class, 'cancelBooking'])->name('cancel-booking');
+
+    /** Enquiry routes - Traveler */
+    Route::post('create-enquiry', [BookingController::class, 'createEnquiry'])->name('create-enquiry');
+    Route::post('confirm-enquiry', [BookingController::class, 'confirmEnquiry'])->name('confirm-enquiry');
 });
 
 Route::post('safari-booking', [BookingController::class, 'safariBooking'])->name('safari-booking');
@@ -102,6 +106,8 @@ Route::middleware(['auth', 'frontend.auth:SAFARI_OPERATOR'])->group(function () 
     Route::any('transfer-money', [WalletController::class, 'transferMoney'])->name('transfer-money');
     Route::get('operator-all-reviews', [SafariOperatorAuthController::class, 'operatorAllReviews'])->name('operator-all-reviews');
 
+    /** Enquiry routes - Operator */
+    Route::post('quote-enquiry', [BookingController::class, 'quoteEnquiry'])->name('quote-enquiry');
 });
 // Route::post('stripe-connect', [StripeController::class, 'stripeConnect'])->name('stripe-connect');
 // Route::get('stripe/refresh', [StripeController::class, 'stripeConnect']);
@@ -131,6 +137,10 @@ Route::middleware(['auth', 'frontend.auth'])->group(function () {
     Route::get('get-help-support', [HomeController::class, 'getHelpSupport'])->name('get-help-support');
     Route::get('search-help-support', [HomeController::class, 'searchHelpSupport'])->name('search-help-support');
     Route::post('report-issue', [IssueController::class, 'reportIssue'])->name('report-issue');
+
+    /** Enquiry routes - Both traveler and operator */
+    Route::post('decline-enquiry', [BookingController::class, 'declineEnquiry'])->name('decline-enquiry');
+    Route::get('get-enquiry', [BookingController::class, 'getEnquiry'])->name('get-enquiry');
 });
 Route::get('locations', [MapController::class, 'getLocations']);
 Route::get('generate-social-link', [HomeController::class, 'genLink'])->name('generate-social-link');

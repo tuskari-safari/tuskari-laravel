@@ -23,7 +23,7 @@ class CountryGuideController extends Controller
             }
 
             if ($request->region) {
-                $countries = $countries->where('region_id', $request->region);
+                $countries = $countries->where('region', $request->region);
             }
 
             if (isset($request->status)) {
@@ -104,8 +104,6 @@ class CountryGuideController extends Controller
                 'unique_experience.*.image.mimes' => 'The image for Unique Experience must be a file of type: jpeg, png, jpg, gif.',
                 'unique_experience.*.image.max' => 'The image for Unique Experience may not be greater than 20MB.',
             ]);
-            $validatedData['region_id'] = $validatedData['region'];
-            unset($validatedData['region']);
             $country = new CountryGuide($validatedData);
 
             if ($request->hasFile('banner_image')) {
@@ -428,7 +426,7 @@ class CountryGuideController extends Controller
             $country->unique_experience_desc = $request->unique_experience_desc;
             $country->middle_sec_title = $request->middle_sec_title;
             $country->middle_sec_subtitle = $request->middle_sec_subtitle;
-            $country->region_id = $request->region;
+            $country->region = $request->region;
             $country->status = $request->status;
             $country->save();
             session()->flash('success', 'Country guide Successfully Updated.');

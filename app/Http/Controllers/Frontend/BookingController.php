@@ -8,6 +8,9 @@ use App\Mail\ManualPaymentToOperatorMail;
 use App\Mail\RefundInitiatedMail;
 use App\Mail\SafariBookingConfirmation;
 use App\Mail\TravelerBookingConfirmation;
+use App\Models\ChatRoom;
+use App\Models\Member;
+use App\Models\Message;
 use App\Models\Payment;
 use App\Models\Safari;
 use App\Models\SafariBooking;
@@ -16,6 +19,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Notifications\SendNotification;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -147,17 +151,23 @@ class BookingController extends Controller
             'operator_adult_price' => 'required|numeric|min:1',
             'operator_child_price' => 'nullable|numeric',
             'hasDiscountAdultPrice' => 'required|boolean',
-            'hasDiscountChildPrice' => 'required|boolean'
+            'hasDiscountChildPrice' => 'required|boolean',
+            'is_enquiry_booking' => 'nullable|boolean',
+            'enquiry_id' => 'nullable|exists:safari_bookings,id'
         ]);
         $safari = Safari::where('id', $validatedData['safari_id'])->first();
+        $isEnquiryBooking = $request->is_enquiry_booking ?? false;
+        $enquiryId = $request->enquiry_id ?? null;
 
-        /** Check if user already has an active booking */
-        $alreadyBooked = SafariBooking::where('traveler_id', Auth::id())
-            ->where('status', 'ACTIVE')
-            ->where('safari_id', $validatedData['safari_id'])
-            ->first();
-        if ($alreadyBooked) {
-            return response()->json(['error' => 'You already have an active booking for this safari.'], 422);
+        /** Check if user already has an active booking (skip for enquiry bookings) */
+        if (!$isEnquiryBooking) {
+            $alreadyBooked = SafariBooking::where('traveler_id', Auth::id())
+                ->where('status', 'ACTIVE')
+                ->where('safari_id', $validatedData['safari_id'])
+                ->first();
+            if ($alreadyBooked) {
+                return response()->json(['error' => 'You already have an active booking for this safari.'], 422);
+            }
         }
 
         DB::beginTransaction();
@@ -174,43 +184,72 @@ class BookingController extends Controller
                 'amount' => $request->payment_type === 'deposit' ? intval($validatedData['deposit_amount'] * 100) : intval($validatedData['total_payable'] * 100),
                 'currency' => 'USD',
                 'payment_method' => $request->card_id,
-                'description' => $safari->title . ' - ' . $request->duration . ' Booking'
+                'description' => $safari->title . ' - ' . $request->duration . ' Booking' . ($isEnquiryBooking ? ' (Enquiry)' : '')
             ];
 
             if (Auth::user()->stripe_customer_id) {
                 $paymentIntentData['customer'] = Auth::user()->stripe_customer_id;
             }
             $paymentIntent = PaymentIntent::create($paymentIntentData);
+
             /** Calculate additional cost */
-            $totalAdultPrice = $validatedData['operator_adult_price'] * $validatedData['number_of_adults'];
-            $totalChildPrice = $validatedData['operator_child_price'] * $validatedData['number_of_children'];
-            $additionalCost = (float) number_format($validatedData['total_adult_price'] - $totalAdultPrice, 2, '.', '');
-            $payToOperator = (float) number_format($totalAdultPrice + $totalChildPrice, 2, '.', '');
+            if ($isEnquiryBooking) {
+                $setting = Setting::first();
+                $platformFeePercentage = $setting->platform_fee ?? 13;
+                $platformFee = round(($validatedData['total_payable'] * $platformFeePercentage) / 100, 2);
+                $payToOperator = $validatedData['total_payable'] - $platformFee;
+                $additionalCost = 0;
+            } else {
+                $totalAdultPrice = $validatedData['operator_adult_price'] * $validatedData['number_of_adults'];
+                $totalChildPrice = $validatedData['operator_child_price'] * $validatedData['number_of_children'];
+                $additionalCost = (float) number_format($validatedData['total_adult_price'] - $totalAdultPrice, 2, '.', '');
+                $payToOperator = (float) number_format($totalAdultPrice + $totalChildPrice, 2, '.', '');
+            }
 
-            $booking = SafariBooking::create([
-                'traveler_id' => Auth::id(),
-                'operator_id' => Safari::find($validatedData['safari_id'])->user_id,
-                'safari_id' => $validatedData['safari_id'],
-                'adult_price' => $validatedData['total_adult_price'],
-                'children_price' => $validatedData['total_child_price'],
-                'check_in_date' => $validatedData['check_in_date'],
-                'check_out_date' => $validatedData['check_out_date'],
-                'no_of_adults' => $validatedData['number_of_adults'],
-                'no_of_children' => $validatedData['number_of_children'] ?? 0,
-                'duration' => $validatedData['duration'],
-                'payment_status' => 'pending',
-                'total_price' => $validatedData['total_payable'],
-                'additional_fee' => $additionalCost,
-                'pay_to_operator' => $payToOperator,
-                'deposit_amount' => $validatedData['deposit_amount'] ?? 0,
-                'next_deposit_amount' => $validatedData['next_deposit_amount'] ?? 0,
-                'next_deposit_date' => $validatedData['next_deposit_date'] ?? null,
-                'payment_type' => $request->payment_type === 'deposit' ? 'deposit_auto_payment' : 'pay_in_full',
-                'payment_method_id' => $validatedData['card_id'],
-                'is_full_paid' => $request->payment_type === 'deposit' ? 0 : 1,
-            ]);
+            /** For enquiry bookings, update existing booking; otherwise create new */
+            if ($isEnquiryBooking && $enquiryId) {
+                $booking = SafariBooking::findOrFail($enquiryId);
+                $booking->update([
+                    'adult_price' => $validatedData['total_adult_price'],
+                    'children_price' => $validatedData['total_child_price'],
+                    'payment_status' => 'pending',
+                    'total_price' => $validatedData['total_payable'],
+                    'additional_fee' => $additionalCost,
+                    'pay_to_operator' => $payToOperator,
+                    'deposit_amount' => $validatedData['deposit_amount'] ?? 0,
+                    'next_deposit_amount' => $validatedData['next_deposit_amount'] ?? 0,
+                    'next_deposit_date' => $validatedData['next_deposit_date'] ?? null,
+                    'payment_type' => $request->payment_type === 'deposit' ? 'deposit_auto_payment' : 'pay_in_full',
+                    'payment_method_id' => $validatedData['card_id'],
+                    'is_full_paid' => $request->payment_type === 'deposit' ? 0 : 1,
+                    'booking_id' => 'TSK-' . $booking->id,
+                ]);
+            } else {
+                $booking = SafariBooking::create([
+                    'traveler_id' => Auth::id(),
+                    'operator_id' => Safari::find($validatedData['safari_id'])->user_id,
+                    'safari_id' => $validatedData['safari_id'],
+                    'adult_price' => $validatedData['total_adult_price'],
+                    'children_price' => $validatedData['total_child_price'],
+                    'check_in_date' => $validatedData['check_in_date'],
+                    'check_out_date' => $validatedData['check_out_date'],
+                    'no_of_adults' => $validatedData['number_of_adults'],
+                    'no_of_children' => $validatedData['number_of_children'] ?? 0,
+                    'duration' => $validatedData['duration'],
+                    'payment_status' => 'pending',
+                    'total_price' => $validatedData['total_payable'],
+                    'additional_fee' => $additionalCost,
+                    'pay_to_operator' => $payToOperator,
+                    'deposit_amount' => $validatedData['deposit_amount'] ?? 0,
+                    'next_deposit_amount' => $validatedData['next_deposit_amount'] ?? 0,
+                    'next_deposit_date' => $validatedData['next_deposit_date'] ?? null,
+                    'payment_type' => $request->payment_type === 'deposit' ? 'deposit_auto_payment' : 'pay_in_full',
+                    'payment_method_id' => $validatedData['card_id'],
+                    'is_full_paid' => $request->payment_type === 'deposit' ? 0 : 1,
+                ]);
 
-            $booking->update(['booking_id' => 'TSK-' . $booking->id]);
+                $booking->update(['booking_id' => 'TSK-' . $booking->id]);
+            }
 
             // Save Payment
             Payment::create([
@@ -680,5 +719,377 @@ class BookingController extends Controller
             Log::error(" :: EXCEPTION :: " . $th->getMessage() . "\n" . $th->getTraceAsString());
             return back()->with('error', 'Failed to cancel booking');
         }
+    }
+
+    public function createEnquiry(Request $request)
+    {
+        $validatedData = $request->validate([
+            'safari_id' => 'required|exists:safaris,id',
+            'check_in_date' => 'required|date',
+            'check_out_date' => 'required|date|after:check_in_date',
+            'number_of_adults' => 'required|integer|min:1',
+            'number_of_children' => 'nullable|integer|min:0',
+            'duration' => 'required|string',
+            'traveler_notes' => 'nullable|string|max:2000',
+        ]);
+
+        $safari = Safari::findOrFail($validatedData['safari_id']);
+
+        if (!$safari->isEnquiryMode()) {
+            return response()->json(['error' => 'This safari does not accept enquiries'], 422);
+        }
+
+        $operatorId = $safari->user_id;
+
+        DB::beginTransaction();
+        try {
+            $chatRoom = $this->findOrCreateChatRoom(Auth::id(), $operatorId);
+
+            $enquiry = SafariBooking::create([
+                'traveler_id' => Auth::id(),
+                'operator_id' => $operatorId,
+                'safari_id' => $validatedData['safari_id'],
+                'check_in_date' => $validatedData['check_in_date'],
+                'check_out_date' => $validatedData['check_out_date'],
+                'no_of_adults' => $validatedData['number_of_adults'],
+                'no_of_children' => $validatedData['number_of_children'] ?? 0,
+                'duration' => $validatedData['duration'],
+                'is_enquiry' => true,
+                'enquiry_status' => 'pending',
+                'chat_room_id' => $chatRoom->id,
+                'traveler_notes' => $validatedData['traveler_notes'],
+                'payment_status' => 'pending',
+            ]);
+
+            $enquiry->update(['booking_id' => 'ENQ-' . $enquiry->id]);
+
+            $checkIn = Carbon::parse($validatedData['check_in_date'])->format('M d, Y');
+            $checkOut = Carbon::parse($validatedData['check_out_date'])->format('M d, Y');
+            $adults = $validatedData['number_of_adults'];
+            $children = $validatedData['number_of_children'] ?? 0;
+
+            $messageContent = "🌍 New Safari Enquiry\n\n";
+            $messageContent .= "Safari: {$safari->title}\n";
+            $messageContent .= "Dates: {$checkIn} - {$checkOut}\n";
+            $messageContent .= "Guests: {$adults} adult(s)";
+            if ($children > 0) {
+                $messageContent .= ", {$children} child(ren)";
+            }
+            $messageContent .= "\n";
+            if (!empty($validatedData['traveler_notes'])) {
+                $messageContent .= "\nMessage:\n{$validatedData['traveler_notes']}";
+            }
+
+            Message::create([
+                'chat_room_id' => $chatRoom->id,
+                'user_id' => Auth::id(),
+                'message' => $messageContent,
+            ]);
+
+            $receiver = User::find($operatorId);
+            $notifyDetails = [
+                'type' => 'New Enquiry',
+                'title' => Auth::user()->first_name . ' sent an enquiry for ' . $safari->title,
+                'body' => Auth::user()->full_name . ' is interested in your safari and wants to plan the trip with you.',
+                'safariId' => $safari->id,
+                'chat_room_id' => $chatRoom->id,
+                'sender' => Auth::id(),
+            ];
+            Notification::send($receiver, new SendNotification($notifyDetails));
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Enquiry submitted successfully',
+                'chat_room_id' => $chatRoom->id,
+                'redirect_url' => route('frontend.messages'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error(" :: ENQUIRY EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return response()->json(['error' => 'Failed to submit enquiry'], 500);
+        }
+    }
+
+    public function quoteEnquiry(Request $request)
+    {
+        $validatedData = $request->validate([
+            'enquiry_id' => 'required|exists:safari_bookings,id',
+            'quoted_total_price' => 'required|numeric|min:1',
+        ]);
+
+        $enquiry = SafariBooking::with(['safari', 'traveler', 'chatRoom'])
+            ->where('id', $validatedData['enquiry_id'])
+            ->where('is_enquiry', true)
+            ->firstOrFail();
+
+        if ($enquiry->operator_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if (!in_array($enquiry->enquiry_status, ['pending', 'quoted'])) {
+            return response()->json(['error' => 'Cannot quote this enquiry'], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $enquiry->update([
+                'quoted_total_price' => $validatedData['quoted_total_price'],
+                'enquiry_status' => 'quoted',
+                'quoted_at' => now(),
+            ]);
+
+            $checkIn = Carbon::parse($enquiry->check_in_date)->format('M d, Y');
+            $checkOut = Carbon::parse($enquiry->check_out_date)->format('M d, Y');
+
+            $messageContent = "💰 Quote Provided\n\n";
+            $messageContent .= "Safari: {$enquiry->safari->title}\n";
+            $messageContent .= "Dates: {$checkIn} - {$checkOut}\n";
+            $messageContent .= "Guests: {$enquiry->no_of_adults} adult(s)";
+            if ($enquiry->no_of_children > 0) {
+                $messageContent .= ", {$enquiry->no_of_children} child(ren)";
+            }
+            $messageContent .= "\n\n";
+            $messageContent .= "Total Price: $" . number_format($validatedData['quoted_total_price'], 2);
+
+            Message::create([
+                'chat_room_id' => $enquiry->chat_room_id,
+                'user_id' => Auth::id(),
+                'message' => $messageContent,
+            ]);
+
+            $notifyDetails = [
+                'type' => 'Quote Received',
+                'title' => 'You received a quote for ' . $enquiry->safari->title,
+                'body' => 'The operator has provided a price of $' . number_format($validatedData['quoted_total_price'], 2) . ' for your enquiry.',
+                'safariId' => $enquiry->safari_id,
+                'chat_room_id' => $enquiry->chat_room_id,
+                'sender' => Auth::id(),
+            ];
+            Notification::send($enquiry->traveler, new SendNotification($notifyDetails));
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Quote submitted successfully',
+                'enquiry' => $enquiry->fresh(),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error(" :: QUOTE EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return response()->json(['error' => 'Failed to submit quote'], 500);
+        }
+    }
+
+    public function confirmEnquiry(Request $request)
+    {
+        $validatedData = $request->validate([
+            'enquiry_id' => 'required|exists:safari_bookings,id',
+        ]);
+
+        $enquiry = SafariBooking::with(['safari', 'operator'])
+            ->where('id', $validatedData['enquiry_id'])
+            ->where('is_enquiry', true)
+            ->firstOrFail();
+
+        if ($enquiry->traveler_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($enquiry->enquiry_status !== 'quoted') {
+            return response()->json(['error' => 'This enquiry has not been quoted yet'], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $enquiry->update([
+                'enquiry_status' => 'confirmed',
+                'total_price' => $enquiry->quoted_total_price,
+            ]);
+
+            $checkIn = Carbon::parse($enquiry->check_in_date)->format('M d, Y');
+            $checkOut = Carbon::parse($enquiry->check_out_date)->format('M d, Y');
+
+            $messageContent = "✅ Enquiry Confirmed\n\n";
+            $messageContent .= "{$enquiry->traveler->first_name} has accepted your quote for:\n";
+            $messageContent .= "Safari: {$enquiry->safari->title}\n";
+            $messageContent .= "Dates: {$checkIn} - {$checkOut}\n";
+            $messageContent .= "Total: $" . number_format($enquiry->quoted_total_price, 2);
+
+            Message::create([
+                'chat_room_id' => $enquiry->chat_room_id,
+                'user_id' => Auth::id(),
+                'message' => $messageContent,
+            ]);
+
+            $setting = Setting::first();
+            $platformFeePercentage = $setting->platform_fee ?? 13;
+            $platformFee = round(($enquiry->quoted_total_price * $platformFeePercentage) / 100, 2);
+            $payToOperator = $enquiry->quoted_total_price - $platformFee;
+
+            $bookingData = [
+                'safari_id' => $enquiry->safari_id,
+                'check_in_date' => $enquiry->check_in_date,
+                'check_out_date' => $enquiry->check_out_date,
+                'number_of_adults' => $enquiry->no_of_adults,
+                'number_of_children' => $enquiry->no_of_children,
+                'duration' => $enquiry->duration,
+                'total_price' => $enquiry->quoted_total_price,
+                'total_adult_price' => $enquiry->quoted_total_price,
+                'total_child_price' => 0,
+                'operator_adult_price' => $payToOperator,
+                'operator_child_price' => 0,
+                'hasDiscountAdultPrice' => false,
+                'hasDiscountChildPrice' => false,
+                'is_enquiry_booking' => true,
+                'enquiry_id' => $enquiry->id,
+            ];
+
+            session()->put('safari_booking', $bookingData);
+
+            $notifyDetails = [
+                'type' => 'Enquiry Confirmed',
+                'title' => Auth::user()->first_name . ' confirmed your quote for ' . $enquiry->safari->title,
+                'body' => Auth::user()->full_name . ' has accepted your quote and is proceeding to payment.',
+                'safariId' => $enquiry->safari_id,
+                'chat_room_id' => $enquiry->chat_room_id,
+                'sender' => Auth::id(),
+            ];
+            Notification::send($enquiry->operator, new SendNotification($notifyDetails));
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Enquiry confirmed',
+                'redirect_url' => route('frontend.checkout'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error(" :: CONFIRM EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return response()->json(['error' => 'Failed to confirm enquiry'], 500);
+        }
+    }
+
+    public function declineEnquiry(Request $request)
+    {
+        $validatedData = $request->validate([
+            'enquiry_id' => 'required|exists:safari_bookings,id',
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        $enquiry = SafariBooking::with(['safari', 'traveler', 'operator'])
+            ->where('id', $validatedData['enquiry_id'])
+            ->where('is_enquiry', true)
+            ->firstOrFail();
+
+        if ($enquiry->traveler_id !== Auth::id() && $enquiry->operator_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if (in_array($enquiry->enquiry_status, ['confirmed', 'declined'])) {
+            return response()->json(['error' => 'Cannot decline this enquiry'], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $enquiry->update([
+                'enquiry_status' => 'declined',
+                'status' => 'CANCELLED',
+                'cancel_reason' => $validatedData['reason'] ?? null,
+            ]);
+
+            $declinedBy = Auth::user();
+            $isOperator = $enquiry->operator_id === Auth::id();
+
+            $messageContent = "❌ Enquiry Declined\n\n";
+            $messageContent .= "The enquiry for {$enquiry->safari->title} has been declined by ";
+            $messageContent .= $isOperator ? "the operator" : "the traveler";
+            if (!empty($validatedData['reason'])) {
+                $messageContent .= ".\n\nReason: {$validatedData['reason']}";
+            }
+
+            Message::create([
+                'chat_room_id' => $enquiry->chat_room_id,
+                'user_id' => Auth::id(),
+                'message' => $messageContent,
+            ]);
+
+            $notifyUser = $isOperator ? $enquiry->traveler : $enquiry->operator;
+            $notifyDetails = [
+                'type' => 'Enquiry Declined',
+                'title' => 'Enquiry for ' . $enquiry->safari->title . ' has been declined',
+                'body' => $declinedBy->full_name . ' has declined the enquiry.',
+                'safariId' => $enquiry->safari_id,
+                'chat_room_id' => $enquiry->chat_room_id,
+                'sender' => Auth::id(),
+            ];
+            Notification::send($notifyUser, new SendNotification($notifyDetails));
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Enquiry declined',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error(" :: DECLINE EXCEPTION :: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return response()->json(['error' => 'Failed to decline enquiry'], 500);
+        }
+    }
+
+    public function getEnquiry(Request $request)
+    {
+        $request->validate([
+            'chat_room_id' => 'required|exists:chat_rooms,id',
+        ]);
+
+        $enquiry = SafariBooking::with(['safari', 'traveler', 'operator'])
+            ->where('chat_room_id', $request->chat_room_id)
+            ->where('is_enquiry', true)
+            ->whereIn('enquiry_status', ['pending', 'quoted'])
+            ->latest()
+            ->first();
+
+        if (!$enquiry) {
+            return response()->json(['enquiry' => null]);
+        }
+
+        if ($enquiry->traveler_id !== Auth::id() && $enquiry->operator_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        return response()->json([
+            'enquiry' => $enquiry,
+            'is_operator' => $enquiry->operator_id === Auth::id(),
+        ]);
+    }
+
+    private function findOrCreateChatRoom(int $userId, int $operatorId): ChatRoom
+    {
+        $existingRoom = ChatRoom::where('is_group', 0)
+            ->whereHas('chatMembers', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
+            ->whereHas('chatMembers', function ($q) use ($operatorId) {
+                $q->where('user_id', $operatorId);
+            })
+            ->first();
+
+        if ($existingRoom) {
+            return $existingRoom;
+        }
+
+        $chatRoom = new ChatRoom();
+        $chatRoom->is_group = 0;
+        $chatRoom->save();
+
+        ChatRoom::where('id', $chatRoom->id)->update(['group_id' => 'grp-' . $chatRoom->id]);
+
+        Member::insert([
+            ['chat_room_id' => $chatRoom->id, 'user_id' => $userId],
+            ['chat_room_id' => $chatRoom->id, 'user_id' => $operatorId],
+        ]);
+
+        return $chatRoom;
     }
 }

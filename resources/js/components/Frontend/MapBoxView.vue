@@ -1,9 +1,13 @@
 <template>
-    <div ref="mapContainer" class="map-container" />
+    <div v-if="hasValidToken" ref="mapContainer" class="map-container" />
+    <div v-else class="map-placeholder">
+        <i class="fas fa-map-marked-alt"></i>
+        <p>Map unavailable</p>
+    </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
@@ -12,7 +16,7 @@ const props = defineProps({
         type: Object,
         required: true
     },
-     zoom: {  
+     zoom: {
         type: Number,
         default: 10
     }
@@ -21,7 +25,12 @@ const props = defineProps({
 const mapContainer = ref(null)
 let map
 
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY
+const mapboxToken = import.meta.env.VITE_MAPBOX_KEY
+const hasValidToken = computed(() => !!mapboxToken)
+
+if (mapboxToken) {
+    mapboxgl.accessToken = mapboxToken
+}
 
 const addMarker = ({ lng, lat, name, description }) => {
     const popupContent = `
@@ -49,6 +58,8 @@ const addMarker = ({ lng, lat, name, description }) => {
 }
 
 onMounted(() => {
+    if (!hasValidToken.value) return
+
     map = new mapboxgl.Map({
         container: mapContainer.value,
         style: 'mapbox://styles/mapbox/satellite-streets-v12',
@@ -85,6 +96,31 @@ onMounted(() => {
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.map-placeholder {
+    width: 100%;
+    height: 600px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.map-placeholder i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+}
+
+.map-placeholder p {
+    font-size: 16px;
+    margin: 0;
+    opacity: 0.8;
 }
 
 /* Custom popup styling */

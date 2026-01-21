@@ -131,6 +131,31 @@
                                 </div>
 
                                 <div class="srvcrtnw-updtinputbx">
+                                    <label>Booking Mode</label>
+                                    <div class="ftrppup-checkbx-rw">
+                                        <div class="ftrppup-checkbx-col">
+                                            <label class="ftrppup-chkbx-lbl">
+                                                <input type="radio" name="booking_mode" value="booking"
+                                                    v-model="form.booking_mode">
+                                                <span>Instant Booking</span>
+                                            </label>
+                                            <small class="text-muted d-block ms-4">Travelers can book and pay immediately</small>
+                                        </div>
+                                        <div class="ftrppup-checkbx-col">
+                                            <label class="ftrppup-chkbx-lbl">
+                                                <input type="radio" name="booking_mode" value="enquiry"
+                                                    v-model="form.booking_mode">
+                                                <span>Enquiry First</span>
+                                            </label>
+                                            <small class="text-muted d-block ms-4">Travelers must discuss with you before booking</small>
+                                        </div>
+                                    </div>
+                                    <span class="text-danger" v-if="form.errors.booking_mode">{{
+                                        form.errors.booking_mode
+                                        }}</span>
+                                </div>
+
+                                <div class="srvcrtnw-updtinputbx">
                                     <label>Upload Cover Image</label>
                                     <div class="input_hldr file-input">
                                         <file-upload @input="form.thumbnail = $event.target.files[0]" accept="image/*"
@@ -1740,6 +1765,7 @@ const form = useForm({
     perDateGroupLimit: props?.safari?.per_date_group_limit ?? '',
     /**totalSlots: props?.safari?.total_slots ?? '',*/
     availabilityTag: props?.safari?.tags[0]?.id ?? '',
+    booking_mode: props?.safari?.booking_mode ?? 'booking',
 
     /** Array Type Input */
     national_parks: props?.safari?.safari_parks
