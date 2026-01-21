@@ -194,10 +194,8 @@ class BookingController extends Controller
 
             /** Calculate additional cost */
             if ($isEnquiryBooking) {
-                $setting = Setting::first();
-                $platformFeePercentage = $setting->platform_fee ?? 13;
-                $platformFee = round(($validatedData['total_payable'] * $platformFeePercentage) / 100, 2);
-                $payToOperator = $validatedData['total_payable'] - $platformFee;
+                // For enquiry bookings, operator_adult_price already contains the quoted net price
+                $payToOperator = (float) $validatedData['operator_adult_price'];
                 $additionalCost = 0;
             } else {
                 $totalAdultPrice = $validatedData['operator_adult_price'] * $validatedData['number_of_adults'];
