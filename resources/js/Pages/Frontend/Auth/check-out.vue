@@ -397,6 +397,8 @@ onMounted(async () => {
     await initializeCurrency();
     fetchCardFromStripe();
     document.body.classList.remove("no-scroll");
+    document.body.classList.remove("scrolloff");
+    document.documentElement.classList.remove("scrolloff");
     stripe = await loadStripe(import.meta.env.VITE_STRIPE_KEY);
 
     await mountPaymentElement();
