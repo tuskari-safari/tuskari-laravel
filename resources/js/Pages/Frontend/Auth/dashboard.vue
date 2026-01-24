@@ -55,8 +55,8 @@
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th class="bkkng_id_cell">Booking Id</th>
-                                            <th class="wd_sfri_nme_cell">Safari name</th>
+                                            <th class="bkkng_id_cell">Booking ID</th>
+                                            <th class="wd_sfri_nme_cell">Safari Name</th>
                                             <th class="lctn_cell">Location</th>
                                             <th class="wd_dte_cell">Date</th>
                                             <th class="wd_prce_cell">Price</th>

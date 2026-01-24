@@ -90,7 +90,7 @@
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th class="bkkng_cell">Booking Id</th>
+                                            <th class="bkkng_cell">Booking ID</th>
                                             <th class="sfri_nme_cell">Paid by</th>
                                             <th class="dte_cell">Date & Time</th>
                                             <th class="dte_cell">Start Date</th>

@@ -48,8 +48,8 @@
                     <table>
                         <thead>
                             <tr>
-                                <th class="bkkng_id_cell">Booking Id</th>
-                                <th class="wd_sfri_nme_cell">Safari name</th>
+                                <th class="bkkng_id_cell">Booking ID</th>
+                                <th class="wd_sfri_nme_cell">Safari Name</th>
                                 <th class="lctn_cell">Location</th>
                                 <th class="wd_dte_cell">Date</th>
                                 <th class="wd_prce_cell">Total</th>
@@ -74,7 +74,7 @@
                                 <td class="prce">{{ formatLocalPrice(booking?.total_price) }}</td>
                                 <td class="prce" v-if="booking?.deposit_amount > 0">${{
                                     Number(booking?.deposit_amount).toLocaleString('en-GB') }}</td>
-                                <td class="prce" v-else>Full Paid</td>
+                                <td class="prce" v-else>Paid in Full</td>
                                 <td>{{ booking?.duration }}</td>
                                 <td>
                                     <div class="stus_cell_hlder">
