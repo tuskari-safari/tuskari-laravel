@@ -72,7 +72,7 @@
                                 </div>
                             </div>
                         </div>
-                        <SendMessage :key="renderKey" :roomDetails="chatDetails" :firstMessage="firstMessage" />
+                        <SendMessage :key="renderKey" :roomDetails="chatDetails" :firstMessage="firstMessage" :setting="setting" />
                     </div>
                     <div v-else>
                         <h4 class="text-center mt-5">Please select a chat</h4>
@@ -91,7 +91,8 @@ import ListHelper from "@/helpers/ListHelper";
 import UserStatus from '@/components/Frontend/UserStatus.vue';
 
 const props = defineProps({
-    chat_list: Object
+    chat_list: Object,
+    setting: Object,
 });
 
 const showMobileChat = ref(false);

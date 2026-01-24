@@ -194,10 +194,8 @@ class BookingController extends Controller
 
             /** Calculate additional cost */
             if ($isEnquiryBooking) {
-                $setting = Setting::first();
-                $platformFeePercentage = $setting->platform_fee ?? 13;
-                $platformFee = round(($validatedData['total_payable'] * $platformFeePercentage) / 100, 2);
-                $payToOperator = $validatedData['total_payable'] - $platformFee;
+                // For enquiry bookings, operator_adult_price already contains the quoted net price
+                $payToOperator = (float) $validatedData['operator_adult_price'];
                 $additionalCost = 0;
             } else {
                 $totalAdultPrice = $validatedData['operator_adult_price'] * $validatedData['number_of_adults'];
@@ -842,7 +840,7 @@ class BookingController extends Controller
             $setting = Setting::first();
             $platformFeePercentage = $setting->platform_fee ?? 13;
             $netPrice = $validatedData['quoted_net_price'];
-            $travelerTotal = round($netPrice / (1 - ($platformFeePercentage / 100)), 2);
+            $travelerTotal = round($netPrice * (1 + ($platformFeePercentage / 100)), 2);
 
             $enquiry->update([
                 'quoted_net_price' => $netPrice,
@@ -940,7 +938,7 @@ class BookingController extends Controller
             if (! $payToOperator) {
                 $setting = Setting::first();
                 $platformFeePercentage = $setting->platform_fee ?? 13;
-                $payToOperator = round($enquiry->quoted_total_price * (1 - ($platformFeePercentage / 100)), 2);
+                $payToOperator = round($enquiry->quoted_total_price / (1 + ($platformFeePercentage / 100)), 2);
             }
 
             $bookingData = [

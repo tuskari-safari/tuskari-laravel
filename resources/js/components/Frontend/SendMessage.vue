@@ -160,7 +160,8 @@ import { route } from 'ziggy-js';
 const page = usePage();
 const props = defineProps({
     roomDetails: Object,
-    firstMessage: String
+    firstMessage: String,
+    setting: Object,
 });
 
 const chatRoomId = ref({});
@@ -186,7 +187,8 @@ const declineReason = ref('');
 const isDeclining = ref(false);
 
 const calculateTravelerTotal = (netPrice) => {
-    return (parseFloat(netPrice) / 0.87).toFixed(2);
+    const platformFeePercent = Number(props.setting?.platform_fee) || 13;
+    return (parseFloat(netPrice) * (1 + platformFeePercent / 100)).toFixed(2);
 };
 
 chatName.value = props.roomDetails.chatName;

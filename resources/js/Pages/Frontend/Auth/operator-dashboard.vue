@@ -55,8 +55,8 @@
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th class="bkkng_cell">Booking Id</th>
-                                            <th class="sfri_nme_cell">Safari name</th>
+                                            <th class="bkkng_cell">Booking ID</th>
+                                            <th class="sfri_nme_cell">Safari Name</th>
                                             <th class="dte_cell">Trip Date</th>
                                             <th class="prce_cell">Price</th>
                                             <th class="wd_prce_cell">Payment Type</th>
@@ -73,7 +73,7 @@
                                             <td>{{ ListHelper.dateFormat(booking.check_in_date, "MMM DD, YYYY") }}</td>
                                             <td class="prce">${{ Math.round(booking?.total_price) }}
                                             </td>
-                                            <td>  {{ booking?.is_full_paid === 1 ? 'Full Paid' : 'Deposit Paid' }}</td>
+                                            <td>  {{ booking?.is_full_paid === 1 ? 'Paid in Full' : 'Deposit Paid' }}</td>
                                             <td>{{ booking?.duration }}</td>
                                             <td>
                                                 <div class="stus_bttn_lke">{{booking?.status.toLowerCase().replace(/\b[a-z]/g,
@@ -172,7 +172,7 @@
                      <div class="trpdtls-tpvrfy-rgt">
                         <div class="trpdtls-paidbutnbx">
                             <div class="trpdtls-pdbutn">
-                                {{ bookingDetails?.is_full_paid === 1 ? 'Full Paid' : 'Deposit Paid' }}
+                                {{ bookingDetails?.is_full_paid === 1 ? 'Paid in Full' : 'Deposit Paid' }}
                             </div>
                         </div>
                     </div>

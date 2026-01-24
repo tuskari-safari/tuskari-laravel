@@ -60,10 +60,10 @@
                     <table>
                         <thead>
                             <tr>
-                                <th class="bkkng_id_cell">Booking Id</th>
-                                <th class="wd_sfri_nme_cell">Safari name</th>
-                                <th class="lctn_cell">Client name</th>
-                                <th class="wd_dte_cell">Booking date</th>
+                                <th class="bkkng_id_cell">Booking ID</th>
+                                <th class="wd_sfri_nme_cell">Safari Name</th>
+                                <th class="lctn_cell">Client Name</th>
+                                <th class="wd_dte_cell">Booking Date</th>
                                 <th class="wd_prce_cell">Price</th>
                                 <th class="wd_prce_cell">Payment Type</th>
                                 <th class="wd_nghts_cell">Duration</th>
@@ -82,7 +82,7 @@
                                 <td>{{ booking?.traveler?.full_name }}</td>
                                 <td>{{ ListHelper.dateFormat(booking?.check_in_date, "MMMM DD, YYYY") }}</td>
                                 <td class="prce">${{ Math.round(booking?.total_price) }}</td>
-                                <td>{{ booking?.is_full_paid == 0 ? 'Deposit' : 'Full Paid' }}</td>
+                                <td>{{ booking?.is_full_paid == 0 ? 'Deposit Paid' : 'Paid in Full' }}</td>
                                 <td>{{ booking?.duration }}</td>
                                 <td>
                                     <div class="stus_cell_hlder">
@@ -144,7 +144,7 @@
                     <div class="trpdtls-tpvrfy-rgt">
                         <div class="trpdtls-paidbutnbx">
                             <div class="trpdtls-pdbutn">
-                                {{ bookingDetails?.is_full_paid === 1 ? 'Full Paid' : 'Deposit Paid' }}
+                                {{ bookingDetails?.is_full_paid === 1 ? 'Paid in Full' : 'Deposit Paid' }}
                             </div>
 
                         </div>
